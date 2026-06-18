@@ -33,9 +33,12 @@ describe('Protected AI routes', () => {
 });
 
 describe('Env-chat routes', () => {
-  it('allows guest to post env-chat', async () => {
-    const res = await request(app).post('/api/env-chat').send({ question: 'What is climate change?' });
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+  it('allows guest to post env-chat and enforces limits', async () => {
+    await request(app).post('/api/env-chat').send({ question: 'Question 1' });
+    await request(app).post('/api/env-chat').send({ question: 'Question 2' });
+    const res = await request(app).post('/api/env-chat').send({ question: 'Question 3' });
+    expect(res.status).toBe(429);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('Guest limit reached');
   });
 });

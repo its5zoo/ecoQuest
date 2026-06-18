@@ -3,6 +3,9 @@ const EnvChat = require('../models/EnvChat');
 const AIService = require('../services/aiService');
 const { getModelForUser } = require('../utils/dbHelper');
 
+// Track guest (unauthenticated) chat limits in-memory by IP
+const guestChatLimits = new Map();
+
 // Helper to get cutoff date (2 days ago)
 const getCutoffDate = () => new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
@@ -62,6 +65,16 @@ exports.sendMessage = async (req, res) => {
       let chat = await UserEnvChat.findOne({ userId });
       if (!chat) chat = new UserEnvChat({ userId, messages: [] });
 
+      // Limit check: at most 10 messages in the last 24 hours
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const dailyUserMsgsCount = chat.messages.filter(m => m.role === 'user' && new Date(m.createdAt) >= oneDayAgo).length;
+      if (dailyUserMsgsCount >= 10) {
+        return res.status(429).json({
+          success: false,
+          message: 'Daily chat limit reached (10 messages/day). Please try again tomorrow!'
+        });
+      }
+
       // Clean up old messages from history on the fly
       const cutoff = getCutoffDate();
       chat.messages = chat.messages.filter(m => new Date(m.createdAt) >= cutoff);
@@ -79,11 +92,28 @@ exports.sendMessage = async (req, res) => {
 
       return res.json({ success: true, userMessage: userMsg, aiMessage: aiMsg });
     } else {
+      // Guest IP limit check: at most 2 messages in the last 24 hours
+      const ip = req.ip;
+      const now = Date.now();
+      const oneDayAgo = now - 24 * 60 * 60 * 1000;
+      let timestamps = guestChatLimits.get(ip) || [];
+      timestamps = timestamps.filter(t => t >= oneDayAgo);
+
+      if (timestamps.length >= 2) {
+        return res.status(429).json({
+          success: false,
+          message: 'Guest limit reached. You can only send 2 messages as a guest. Please log in to continue chatting!'
+        });
+      }
+
+      timestamps.push(now);
+      guestChatLimits.set(ip, timestamps);
+
       // Guest / mock token — AI response without DB
       const answer = await AIService.envChatAnswer(question.trim(), []);
-      const now = new Date();
-      const userMsg = { role: 'user',      content: question.trim(), createdAt: now, _id: `g-${Date.now()}` };
-      const aiMsg   = { role: 'assistant', content: answer,           createdAt: now, _id: `g-${Date.now() + 1}` };
+      const nowTime = new Date();
+      const userMsg = { role: 'user',      content: question.trim(), createdAt: nowTime, _id: `g-${Date.now()}` };
+      const aiMsg   = { role: 'assistant', content: answer,           createdAt: nowTime, _id: `g-${Date.now() + 1}` };
 
       return res.json({ success: true, userMessage: userMsg, aiMessage: aiMsg });
     }
