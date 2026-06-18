@@ -1,6 +1,6 @@
 import useAuthStore from '../store/authStore';
 
-const rawApi = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e.up.railway.app/api';
 const cleanApi = rawApi.replace(/\/+$/, '');
 const BACKEND = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
 

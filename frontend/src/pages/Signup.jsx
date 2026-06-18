@@ -7,7 +7,7 @@ import Icon from '../components/shared/Icon';
 
 const rawBackend = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace('/api', '')
-  : 'https://carbonfootprint-production-636f.up.railway.app';
+  : 'https://ecoquest-production-ca0e.up.railway.app';
 const BACKEND = rawBackend.replace(/\/+$/, '');
 
 /* ── Gmail Validator Logic ───────────────────────────────────────────────── */
