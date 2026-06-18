@@ -101,10 +101,11 @@ function RealisticEarth({ animPhase }) {
   );
 }
 
-export default function Earth3D({ animPhase = 0 }) {
+export default function Earth3D({ animPhase = 0, earthContainerRef }) {
   const containerRef = useRef(null);
   const [ready, setReady] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const [eventElement, setEventElement] = useState(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -143,14 +144,20 @@ export default function Earth3D({ animPhase = 0 }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (ready) {
+      setEventElement(earthContainerRef?.current || containerRef.current);
+    }
+  }, [ready, earthContainerRef]);
+
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent', touchAction: 'none' }}>
       {ready && (
-        <Canvas key={retryKey} camera={{ position: [0, 0, 40], fov: 30 }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+        <Canvas key={retryKey} camera={{ position: [0, 0, 40], fov: 30 }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'none' }}>
           <React.Suspense fallback={null}>
             <RealisticEarth animPhase={animPhase} />
           </React.Suspense>
-          <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} target={[0, 0, 0]} />
+          <OrbitControls key={eventElement ? 'custom-controls' : 'default-controls'} domElement={eventElement || undefined} enableZoom={false} enablePan={false} autoRotate={false} target={[0, 0, 0]} />
         </Canvas>
       )}
     </div>

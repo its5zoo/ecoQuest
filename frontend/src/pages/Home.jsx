@@ -520,10 +520,11 @@ export default function Home() {
                   transform: 'translateY(-50%)',
                   width: '100%',
                   height: '100%',
-                  zIndex: 20
+                  zIndex: 20,
+                  touchAction: 'none'
                 }}
               >
-                <Earth3D animPhase={animPhase} />
+                <Earth3D animPhase={animPhase} earthContainerRef={earthContainerRef} />
                 <HeroAnimationOverlay
                   key="hero-overlay-v3"
                   phase={animPhase}
