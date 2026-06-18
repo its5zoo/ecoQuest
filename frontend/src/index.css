@@ -886,14 +886,20 @@ button, .btn-primary, .btn-outline {
 
 .chat-input-bar {
   padding: 8px 12px;
-  border-top: 1px solid rgba(0,0,0,0.07);
   background: #FFFFFF;
   flex-shrink: 0;
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06), 0 -2px 8px rgba(0, 0, 0, 0.02);
+  max-width: 850px;
+  width: calc(100% - 24px);
+  margin: 0 auto 16px auto;
 }
 @media (min-width: 768px) {
   .chat-input-bar {
     padding: 10px 18px;
+    width: calc(100% - 40px);
+    margin: 0 auto 20px auto;
   }
 }
 
