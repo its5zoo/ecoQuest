@@ -1,6 +1,58 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, Component } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Float, Sparkles } from '@react-three/drei';
+
+function isWebGLAvailable() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch {
+    return false;
+  }
+}
+
+class VirtualForestErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('VirtualForest WebGL error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          width: '100%',
+          height: '300px',
+          borderRadius: '16px',
+          background: 'linear-gradient(135deg, #10B981, #059669)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          padding: '24px',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌳</div>
+          <h4 style={{ margin: '0 0 8px', fontWeight: 800 }}>Your Virtual Forest</h4>
+          <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.9, maxWidth: '280px' }}>
+            Forest Level {this.props.level} with {this.props.plantedTrees} trees planted.
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function seededRandom(seed) {
   const x = Math.sin(seed) * 10000;
@@ -112,7 +164,7 @@ function Island({ level, trees, islandRadius, extraProps }) {
   );
 }
 
-export default function VirtualForest({ level = 1, plantedTrees = 0 }) {
+function VirtualForestInner({ level = 1, plantedTrees = 0 }) {
   // Generate random stable positions for trees and calculate dynamic island size
   const { trees, islandRadius, extraProps } = useMemo(() => {
     const count = Math.min(50, level + plantedTrees);
@@ -170,5 +222,42 @@ export default function VirtualForest({ level = 1, plantedTrees = 0 }) {
         />
       </Canvas>
     </div>
+  );
+}
+
+export default function VirtualForest(props) {
+  const hasWebGL = useMemo(() => isWebGLAvailable(), []);
+
+  if (!hasWebGL) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '300px',
+        borderRadius: '16px',
+        background: 'linear-gradient(135deg, #10B981, #059669)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        padding: '24px',
+        boxSizing: 'border-box',
+        textAlign: 'center',
+      }}>
+        <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🌳</div>
+        <h4 style={{ margin: '0 0 8px', fontWeight: 800 }}>Your Virtual Forest</h4>
+        <p style={{ margin: 0, fontSize: '0.88rem', opacity: 0.9, maxWidth: '280px' }}>
+          Forest Level {props.level} with {props.plantedTrees} trees planted.
+          <br />
+          <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>(WebGL is not available or disabled on your device)</span>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <VirtualForestErrorBoundary level={props.level} plantedTrees={props.plantedTrees}>
+      <VirtualForestInner {...props} />
+    </VirtualForestErrorBoundary>
   );
 }

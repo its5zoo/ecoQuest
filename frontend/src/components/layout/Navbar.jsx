@@ -95,6 +95,7 @@ export default function Navbar() {
       plantedTrees: 0,
       forestLevel: 1,
     });
+    setMenuOpen(false);
     navigate('/');
   };
 
@@ -398,6 +399,7 @@ export default function Navbar() {
                 >
                   <Link
                     to={link.path}
+                    onClick={() => setMenuOpen(false)}
                     style={{
                       display: 'block',
                       padding: '14px 20px',
@@ -424,10 +426,10 @@ export default function Navbar() {
                 </button>
               ) : (
                 <>
-                  <Link to="/login" style={{ flex: 1 }}>
+                  <Link to="/login" style={{ flex: 1 }} onClick={() => setMenuOpen(false)}>
                     <button className="btn-outline" style={{ width: '100%', padding: '10px 16px', fontSize: '0.9rem' }}>Login</button>
                   </Link>
-                  <Link to="/signup" style={{ flex: 1 }}>
+                  <Link to="/signup" style={{ flex: 1 }} onClick={() => setMenuOpen(false)}>
                     <button className="btn-primary" style={{ width: '100%', padding: '10px 16px', fontSize: '0.9rem' }}><span>Sign Up</span></button>
                   </Link>
                 </>
