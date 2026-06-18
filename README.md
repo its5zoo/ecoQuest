@@ -23,15 +23,15 @@ A full-stack, gamified carbon footprint tracker built for the climate generation
 
 ## 📸 Screenshots
 
-> **Pages**: Home → Tracker → Calculator → Community → Profile → News
+> **Pages**: Home → Tracker → Calculator → Community → Profile → EcoGuide (Chat)
 
 | Hero Section | Carbon Tracker | Leaderboard |
 |:---:|:---:|:---:|
 | 3D Earth animation with particle system | Real-time daily score + quest board | District / State / National rankings |
 
-| Profile | Calculator | News Hub |
+| Profile | Calculator | EcoGuide AI Chat |
 |:---:|:---:|:---:|
-| Virtual forest, heatmap & badges | Pie + bar chart breakdown | Live env. news with XP rewards |
+| Virtual forest, heatmap & badges | Pie + bar chart breakdown | Interactive AI environmental advisor |
 
 ---
 
@@ -65,12 +65,11 @@ A full-stack, gamified carbon footprint tracker built for the climate generation
 - **Paginated API** — Up to 200 entries per page with full user details
 - **Podium Endpoint** — Top-3 "gold / silver / bronze" view for quick display
 
-### 🌐 Environmental News
-- **Live News Feed** — Climate, carbon, pollution, and sustainability stories
-- **Category Filtering** — Filter by topic with animated pill navigation
-- **Search** — Full-text search across headlines and descriptions
-- **News Rewards** — Earn 3 coins + 10 XP per article read (capped at 3/day)
-- **Skeleton Loading** — Graceful loading states
+### 💬 EcoGuide AI Chat
+- **EcoGuide AI Assistant** — Smart chatbot helper specialized strictly in carbon footprints, sustainability, and green choices
+- **Topic Restrictions** — Built-in AI guardrails preventing off-topic questions (sports, coding, general news, etc.)
+- **Actionable Tips** — Structured answers with clear headings, bulleted item details, and quick daily tips
+- **Offline Safety Notice** — Graceful in-UI fallback notifying the user if the server API key is not configured
 
 ### 🔐 Auth & Identity
 - **JWT Authentication** — 30-day tokens, bcrypt password hashing
@@ -101,7 +100,7 @@ A full-stack, gamified carbon footprint tracker built for the climate generation
 │  Calculator      QuestBoard                socialStore            │
 │  Community       VirtualForest             profileStore           │
 │  Profile         AvatarPicker                                     │
-│  News            LiveScoreEngine                                  │
+│  News (Chat)     LiveScoreEngine                                  │
 │  Login/Signup    HeroAnimationOverlay                             │
 │                  AchievementModal                                 │
 │                  ShareCard                                        │
@@ -250,7 +249,7 @@ CarbonPrint/
         │   ├── Calculator.jsx        # Slider inputs, pie chart, benchmark bar chart
         │   ├── Community.jsx         # Leaderboard, challenges, carbon benchmarks
         │   ├── Profile.jsx           # Avatar, forest, heatmap, badges, rankings
-        │   ├── News.jsx              # Filtered news feed with XP rewards
+        │   ├── News.jsx              # EcoGuide AI Chat assistant page
         │   ├── Login.jsx
         │   └── Signup.jsx
         ├── components/
