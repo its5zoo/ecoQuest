@@ -7,11 +7,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import Router from './routes/Router';
 import useAuthStore from './store/authStore';
 import useTrackerStore from './store/trackerStore';
+import apiRequest from './services/apiClient';
 
 export default function App() {
   const validateSession = useAuthStore((s) => s.validateSession);
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const token = useAuthStore((s) => s.token);
 
   useEffect(() => {
     // Clear any stale mock-token sessions from old app versions
@@ -35,6 +37,32 @@ export default function App() {
       });
     }
   }, [isAuthenticated, user]);
+
+  // Sync logged-in user's activities from backend to update Profile page stats
+  useEffect(() => {
+    const syncActivities = async () => {
+      if (isAuthenticated && token && token !== 'mock-token-fallback') {
+        try {
+          const data = await apiRequest('/tracker/all', { token });
+          if (data && data.activities) {
+            const mapped = data.activities.map(a => ({
+              id: a._id,
+              name: a.activityType,
+              category: a.category,
+              duration: a.duration,
+              quantity: a.quantity,
+              carbonKg: a.co2Generated,
+              timestamp: a.timestamp
+            }));
+            useTrackerStore.setState({ activities: mapped });
+          }
+        } catch (err) {
+          console.error('Failed to sync activities from backend:', err);
+        }
+      }
+    };
+    syncActivities();
+  }, [isAuthenticated, token]);
 
   return (
     <BrowserRouter>

@@ -59,7 +59,7 @@ export const QUICK_ACTIVITIES = [
   { id: 'q3', name: 'AC usage',         category: 'home',      unit: 'hours', factor: EMISSION_FACTORS.ac },
   { id: 'q4', name: 'Watched TV',       category: 'home',      unit: 'hours', factor: EMISSION_FACTORS.tv },
   { id: 'q5', name: 'Used computer',    category: 'home',      unit: 'hours', factor: EMISSION_FACTORS.computer },
-  { id: 'q6', name: 'Beef meal',        category: 'food',      unit: 'meals', factor: EMISSION_FACTORS.beef_meal },
+  { id: 'q6', name: 'Plant-based meal', category: 'food',      unit: 'meals', factor: EMISSION_FACTORS.vegan_meal },
   { id: 'q7', name: 'Vegetarian meal',  category: 'food',      unit: 'meals', factor: EMISSION_FACTORS.vegetarian_meal },
   { id: 'q8', name: 'Plastic bottle',   category: 'waste',     unit: 'items', factor: EMISSION_FACTORS.plastic_bottle },
   { id: 'q9', name: 'Hot shower',       category: 'water',     unit: 'mins',  factor: 0.035 },

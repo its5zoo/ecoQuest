@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
+import useTrackerStore from '../../store/trackerStore';
 import Icon from '../shared/Icon';
 import AvatarSVG, { parseSvgAvatarId } from '../shared/AvatarSVG';
 import { keyboardActivate } from '../../utils/a11y';
@@ -81,6 +82,16 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
+    useTrackerStore.setState({
+      activities: [],
+      totalXP: 0,
+      streak: 0,
+      weeklyStreak: 0,
+      monthlyStreak: 0,
+      coins: 0,
+      plantedTrees: 0,
+      forestLevel: 1,
+    });
     navigate('/');
   };
 
