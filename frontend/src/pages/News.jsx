@@ -106,48 +106,62 @@ function EcoGuideAvatar({ size = 36 }) {
     <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(16,185,129,0.4)', boxShadow: '0 0 0 3px rgba(16,185,129,0.12)' }}>
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
         <defs>
-          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E8FDF5" />
-            <stop offset="100%" stopColor="#A7F3D0" />
+          <radialGradient id="skyGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#E6FFFA" />
+            <stop offset="100%" stopColor="#B2F5EA" />
+          </radialGradient>
+          <linearGradient id="canopyBack" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#10B981" />
           </linearGradient>
-          <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="70%" stopColor="#f3fbf7" />
-            <stop offset="100%" stopColor="#d1fae5" />
+          <linearGradient id="canopyFront" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#10B981" />
+            <stop offset="100%" stopColor="#34D399" />
           </linearGradient>
-          <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0EA5E9" />
-            <stop offset="100%" stopColor="#0284C7" />
+          <linearGradient id="canopyHighlight" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#34D399" />
+            <stop offset="100%" stopColor="#6EE7B7" />
           </linearGradient>
-          <filter id="eyeGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#78350F" />
+            <stop offset="50%" stopColor="#92400E" />
+            <stop offset="100%" stopColor="#78350F" />
+          </linearGradient>
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="1" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
-          <linearGradient id="leafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#10b981" />
-            <stop offset="100%" stopColor="#4ADE80" />
-          </linearGradient>
         </defs>
-        <circle cx="50" cy="50" r="48" fill="url(#bgGrad)" stroke="#10b981" strokeWidth="2.5" />
-        <path d="M25 88 C 25 72, 75 72, 75 88 Z" fill="url(#metalGrad)" stroke="#A7F3D0" strokeWidth="1" />
-        <rect x="44" y="68" width="12" height="6" rx="2" fill="#94A3B8" />
-        <rect x="28" y="32" width="44" height="38" rx="19" fill="url(#metalGrad)" stroke="#FFFFFF" strokeWidth="1.5" />
-        <rect x="33" y="37" width="34" height="24" rx="10" fill="url(#visorGrad)" />
-        <path d="M33 45 C33 40, 67 40, 67 45 C67 41, 33 41, 33 45 Z" fill="rgba(255, 255, 255, 0.2)" />
-        <path d="M37 39 Q 45 42, 63 39" stroke="rgba(255, 255, 255, 0.35)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <circle cx="43" cy="48" r="3.5" fill="#FFFFFF" filter="url(#eyeGlow)" />
-        <circle cx="57" cy="48" r="3.5" fill="#FFFFFF" filter="url(#eyeGlow)" />
-        <circle cx="44.5" cy="46.5" r="1" fill="#0EA5E9" />
-        <circle cx="58.5" cy="46.5" r="1" fill="#0EA5E9" />
-        <path d="M46 54 Q 50 57, 54 54" stroke="#FFFFFF" strokeWidth="2.5" fill="none" strokeLinecap="round" filter="url(#eyeGlow)" />
-        <circle cx="37" cy="53" r="1.5" fill="#F43F5E" opacity="0.7" filter="url(#eyeGlow)" />
-        <circle cx="63" cy="53" r="1.5" fill="#F43F5E" opacity="0.7" filter="url(#eyeGlow)" />
-        <path d="M50 32 Q 50 21, 46 14" stroke="#64748B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M50 32 Q 50 21, 54 14" stroke="#475569" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M46 14 C 36 10, 32 17, 46 14 Z" fill="url(#leafGrad)" />
-        <path d="M54 14 C 64 10, 68 17, 54 14 Z" fill="url(#leafGrad)" />
-        <rect x="42" y="70" width="16" height="8" rx="4" fill="#10b981" />
-        <text x="50" y="76.5" textAnchor="middle" fill="#FFFFFF" fontSize="5.5" fontWeight="900" fontFamily="sans-serif">AI</text>
+        <circle cx="50" cy="50" r="48" fill="url(#skyGrad)" stroke="#319795" strokeWidth="2.5" />
+        <path d="M42 90 L44 60 C44 55, 56 55, 56 60 L58 90 Z" fill="url(#trunkGrad)" />
+        <path d="M42 90 C34 90, 32 85, 42 85 C42 85, 58 85, 58 85 C68 85, 66 90, 58 90 Z" fill="#78350F" />
+        <path d="M44 65 Q34 60, 36 54 Q38 52, 43 58" stroke="#92400E" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <path d="M56 65 Q66 60, 64 54 Q62 52, 57 58" stroke="#92400E" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <circle cx="35" cy="40" r="16" fill="url(#canopyBack)" />
+        <circle cx="65" cy="40" r="16" fill="url(#canopyBack)" />
+        <circle cx="50" cy="30" r="18" fill="url(#canopyBack)" />
+        <circle cx="36" cy="42" r="13" fill="url(#canopyFront)" />
+        <circle cx="64" cy="42" r="13" fill="url(#canopyFront)" />
+        <circle cx="50" cy="33" r="15" fill="url(#canopyFront)" />
+        <circle cx="42" cy="31" r="9" fill="url(#canopyHighlight)" />
+        <circle cx="58" cy="31" r="9" fill="url(#canopyHighlight)" />
+        <circle cx="50" cy="25" r="10" fill="url(#canopyHighlight)" />
+        <circle cx="42" cy="42" r="4.5" fill="#0F172A" />
+        <circle cx="58" cy="42" r="4.5" fill="#0F172A" />
+        <circle cx="43.5" cy="40.5" r="1.5" fill="#FFFFFF" />
+        <circle cx="59.5" cy="40.5" r="1.5" fill="#FFFFFF" />
+        <circle cx="41" cy="43.5" r="0.8" fill="#FFFFFF" />
+        <circle cx="57" cy="43.5" r="0.8" fill="#FFFFFF" />
+        <path d="M46 47 Q50 51, 54 47" stroke="#0F172A" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <circle cx="37" cy="46" r="2" fill="#F43F5E" opacity="0.6" filter="url(#softGlow)" />
+        <circle cx="63" cy="46" r="2" fill="#F43F5E" opacity="0.6" filter="url(#softGlow)" />
+        <circle cx="28" cy="35" r="2" fill="#FCD34D" filter="url(#softGlow)" />
+        <path d="M28 32 C26 32, 26 38, 28 38 C30 38, 30 32, 28 32 Z" fill="#FB7185" />
+        <path d="M25 35 C25 33, 31 33, 31 35 C31 37, 25 37, 25 35 Z" fill="#FB7185" />
+        <circle cx="72" cy="35" r="2" fill="#FCD34D" filter="url(#softGlow)" />
+        <path d="M72 32 C70 32, 70 38, 72 38 C74 38, 74 32, 72 32 Z" fill="#FB7185" />
+        <path d="M69 35 C69 33, 75 33, 75 35 C75 37, 69 37, 69 35 Z" fill="#FB7185" />
+        <path d="M57 76 C59 72, 65 72, 63 76 Z" fill="#4ADE80" />
       </svg>
     </div>
   );
