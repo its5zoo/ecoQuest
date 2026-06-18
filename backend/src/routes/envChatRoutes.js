@@ -5,7 +5,7 @@ const { protect, optionalProtect } = require('../middleware/authMiddleware');
 const spamLimiter = require('../middleware/spamLimiter');
 
 router.get('/', optionalProtect, getHistory);
-router.post('/', protect, spamLimiter({ maxRequests: 10, windowMs: 60000, actionName: 'messages' }), sendMessage);
-router.delete('/', protect, clearHistory);
+router.post('/', optionalProtect, spamLimiter({ maxRequests: 10, windowMs: 60000, actionName: 'messages' }), sendMessage);
+router.delete('/', optionalProtect, clearHistory);
 
 module.exports = router;

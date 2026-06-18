@@ -32,9 +32,10 @@ describe('Protected AI routes', () => {
   });
 });
 
-describe('Protected env-chat routes', () => {
-  it('requires auth to post env-chat', async () => {
+describe('Env-chat routes', () => {
+  it('allows guest to post env-chat', async () => {
     const res = await request(app).post('/api/env-chat').send({ question: 'What is climate change?' });
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 });
