@@ -107,47 +107,47 @@ function EcoGuideAvatar({ size = 36 }) {
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
         <defs>
           <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#022c22" />
-            <stop offset="100%" stopColor="#064e3b" />
+            <stop offset="0%" stopColor="#E8FDF5" />
+            <stop offset="100%" stopColor="#A7F3D0" />
           </linearGradient>
           <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="60%" stopColor="#f0fdf4" />
-            <stop offset="100%" stopColor="#cbd5e1" />
+            <stop offset="70%" stopColor="#f3fbf7" />
+            <stop offset="100%" stopColor="#d1fae5" />
           </linearGradient>
           <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#047857" />
-            <stop offset="100%" stopColor="#064e3b" />
+            <stop offset="0%" stopColor="#0EA5E9" />
+            <stop offset="100%" stopColor="#0284C7" />
           </linearGradient>
-          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <filter id="eyeGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
           <linearGradient id="leafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
             <stop offset="0%" stopColor="#10b981" />
-            <stop offset="100%" stopColor="#34d399" />
+            <stop offset="100%" stopColor="#4ADE80" />
           </linearGradient>
         </defs>
-        <circle cx="50" cy="50" r="48" fill="url(#bgGrad)" stroke="#10b981" strokeWidth="2" />
-        <path d="M25 88 C 25 70, 75 70, 75 88 Z" fill="url(#metalGrad)" />
-        <path d="M40 70 L60 70 L55 77 L45 77 Z" fill="#94a3b8" />
-        <rect x="30" y="32" width="40" height="36" rx="18" fill="url(#metalGrad)" />
-        <rect x="34" y="36" width="32" height="24" rx="10" fill="url(#visorGrad)" />
-        <path d="M34 46 C34 40, 66 40, 66 46 C66 42, 34 42, 34 46 Z" fill="rgba(255, 255, 255, 0.15)" />
-        <path d="M38 38 Q 45 42, 62 38" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <circle cx="43" cy="48" r="3.5" fill="#34d399" filter="url(#glow)" />
-        <circle cx="57" cy="48" r="3.5" fill="#34d399" filter="url(#glow)" />
-        <circle cx="44.5" cy="46.5" r="1" fill="#ffffff" />
-        <circle cx="58.5" cy="46.5" r="1" fill="#ffffff" />
-        <path d="M46 54 Q 50 57, 54 54" stroke="#34d399" strokeWidth="2" fill="none" strokeLinecap="round" filter="url(#glow)" />
-        <circle cx="38" cy="52" r="1.5" fill="#f43f5e" opacity="0.6" filter="url(#glow)" />
-        <circle cx="62" cy="52" r="1.5" fill="#f43f5e" opacity="0.6" filter="url(#glow)" />
-        <path d="M50 32 Q 50 22, 46 16" stroke="#64748b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M50 32 Q 50 22, 54 16" stroke="#475569" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M46 16 C 38 12, 34 18, 46 16 Z" fill="url(#leafGrad)" filter="url(#glow)" />
-        <path d="M54 16 C 62 12, 66 18, 54 16 Z" fill="url(#leafGrad)" filter="url(#glow)" opacity="0.9" />
+        <circle cx="50" cy="50" r="48" fill="url(#bgGrad)" stroke="#10b981" strokeWidth="2.5" />
+        <path d="M25 88 C 25 72, 75 72, 75 88 Z" fill="url(#metalGrad)" stroke="#A7F3D0" strokeWidth="1" />
+        <rect x="44" y="68" width="12" height="6" rx="2" fill="#94A3B8" />
+        <rect x="28" y="32" width="44" height="38" rx="19" fill="url(#metalGrad)" stroke="#FFFFFF" strokeWidth="1.5" />
+        <rect x="33" y="37" width="34" height="24" rx="10" fill="url(#visorGrad)" />
+        <path d="M33 45 C33 40, 67 40, 67 45 C67 41, 33 41, 33 45 Z" fill="rgba(255, 255, 255, 0.2)" />
+        <path d="M37 39 Q 45 42, 63 39" stroke="rgba(255, 255, 255, 0.35)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <circle cx="43" cy="48" r="3.5" fill="#FFFFFF" filter="url(#eyeGlow)" />
+        <circle cx="57" cy="48" r="3.5" fill="#FFFFFF" filter="url(#eyeGlow)" />
+        <circle cx="44.5" cy="46.5" r="1" fill="#0EA5E9" />
+        <circle cx="58.5" cy="46.5" r="1" fill="#0EA5E9" />
+        <path d="M46 54 Q 50 57, 54 54" stroke="#FFFFFF" strokeWidth="2.5" fill="none" strokeLinecap="round" filter="url(#eyeGlow)" />
+        <circle cx="37" cy="53" r="1.5" fill="#F43F5E" opacity="0.7" filter="url(#eyeGlow)" />
+        <circle cx="63" cy="53" r="1.5" fill="#F43F5E" opacity="0.7" filter="url(#eyeGlow)" />
+        <path d="M50 32 Q 50 21, 46 14" stroke="#64748B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M50 32 Q 50 21, 54 14" stroke="#475569" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M46 14 C 36 10, 32 17, 46 14 Z" fill="url(#leafGrad)" />
+        <path d="M54 14 C 64 10, 68 17, 54 14 Z" fill="url(#leafGrad)" />
         <rect x="42" y="70" width="16" height="8" rx="4" fill="#10b981" />
-        <text x="50" y="76.5" textAnchor="middle" fill="#ffffff" fontSize="5.5" fontWeight="900" fontFamily="sans-serif">AI</text>
+        <text x="50" y="76.5" textAnchor="middle" fill="#FFFFFF" fontSize="5.5" fontWeight="900" fontFamily="sans-serif">AI</text>
       </svg>
     </div>
   );
