@@ -284,11 +284,10 @@ export default function Signup() {
           flex: '0 0 420px',
           background: 'linear-gradient(135deg, #0F2D1A, #061A10)',
           padding: '60px 40px',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
           borderRight: '1px solid rgba(0,200,150,0.15)',
           position: 'relative', overflow: 'hidden',
         }}
-        className="hidden lg:flex"
+        className="hidden lg:flex lg:flex-col lg:justify-center"
       >
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
