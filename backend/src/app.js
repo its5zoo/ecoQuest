@@ -39,6 +39,7 @@ app.use(cors({
     process.env.FRONTEND_URL,
     'https://ecoquesteits5zoo.up.railway.app',
     'https://ecoquest5zoo.netlify.app',
+    'https://meticulous-amazement-production-dad1.up.railway.app',
     'http://localhost:5173'
   ].filter(Boolean),
   credentials: true,
