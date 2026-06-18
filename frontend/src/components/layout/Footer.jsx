@@ -25,14 +25,6 @@ const FOOTER_LINKS = {
   ],
 };
 
-const SOCIAL_LINKS = [
-  { icon: '🐦', label: 'Twitter',   href: '#' },
-  { icon: '📘', label: 'Facebook',  href: '#' },
-  { icon: '📸', label: 'Instagram', href: '#' },
-  { icon: '💼', label: 'LinkedIn',  href: '#' },
-  { icon: '▶️',  label: 'YouTube',   href: '#' },
-];
-
 const STATS = [
   { value: '2.4M+', label: 'Users Tracking' },
   { value: '18K',   label: 'Tonnes CO₂ Saved' },

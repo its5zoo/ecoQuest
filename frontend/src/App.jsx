@@ -39,7 +39,7 @@ function LocationRequiredModal() {
       } else {
         toast.error(res?.message || 'Failed to update location.');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setLoading(false);

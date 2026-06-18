@@ -63,37 +63,6 @@ function generateHumanShape() {
 }
 const HUMAN_SHAPE = generateHumanShape();
 
-function drawFootprint(ctx, x, y, angle, isLeft, color, opacity) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
-  ctx.globalAlpha = opacity;
-  ctx.fillStyle = color;
-
-  const scale = 0.7;
-  ctx.scale(scale, scale);
-
-  const dx = isLeft ? -2 : 2;
-
-  // Heel
-  ctx.beginPath();
-  ctx.ellipse(dx * 1.5, 12, 5, 7, dx * 0.1, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Sole
-  ctx.beginPath();
-  ctx.ellipse(dx * 0.5, -2, 7, 10, dx * 0.15, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Toes
-  ctx.beginPath(); ctx.arc(dx * 3, -15, 2.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(dx * 8, -13, 2.0, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(dx * 12, -9, 1.5, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(dx * 15, -4, 1.2, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(dx * -3, -14, 3.5, 0, Math.PI * 2); ctx.fill(); // big toe
-
-  ctx.restore();
-}
 
 export default function HeroAnimationOverlay({ phase, earthContainerRef, humanContainerRef }) {
   const canvasRef = useRef(null);
@@ -156,7 +125,7 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
     window.addEventListener('resize', updateSize);
 
     // Init particles targeting human shape
-    const particles = HUMAN_SHAPE.map((pt, i) => {
+    const particles = HUMAN_SHAPE.map((pt) => {
       const sizeBase = Math.random();
       // Increase size so they are more prominent and dense, matching the reference image!
       const pSize = sizeBase > 0.85
@@ -182,9 +151,7 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
     let frame = 0;
     let lastPhase = -1;
 
-    // Track previous orbit angle to place footprints
-    let lastFootprintAngle = 0;
-    let isLeftFoot = true;
+
 
     function draw() {
       // Dynamic canvas internal size sync to prevent layout-based stretching
@@ -366,7 +333,7 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', updateSize);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ position: 'absolute', top: 'calc(50% - 600px)', left: 'calc(50% - 600px)', width: '1200px', height: '1200px', pointerEvents: 'none', zIndex: 30 }}>

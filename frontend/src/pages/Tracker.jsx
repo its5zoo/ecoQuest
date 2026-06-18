@@ -26,12 +26,8 @@ function LiveImpactPanel({ dailyTotal }) {
   const BASE = { logs: 18420, co2: 84320.5, trees: 2140 };
   const [stats, setStats] = useState(BASE);
   const [feed, setFeed] = useState([]);
-  const [localDailyTotal, setLocalDailyTotal] = useState(dailyTotal);
+  const [liveGrowth, setLiveGrowth] = useState(0);
   const feedRef = useRef(null);
-
-  useEffect(() => {
-    setLocalDailyTotal(dailyTotal);
-  }, [dailyTotal]);
 
   // Grow global counters every 3s
   useEffect(() => {
@@ -41,7 +37,7 @@ function LiveImpactPanel({ dailyTotal }) {
         co2: parseFloat((s.co2 + Math.random() * 2.5 + 0.5).toFixed(1)),
         trees: s.trees + (Math.random() > 0.85 ? 1 : 0),
       }));
-      setLocalDailyTotal(prev => prev + (Math.random() * 0.002 + 0.001));
+      setLiveGrowth(prev => prev + (Math.random() * 0.002 + 0.001));
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -57,6 +53,8 @@ function LiveImpactPanel({ dailyTotal }) {
     const interval = setInterval(push, 5000 + Math.random() * 2000);
     return () => clearInterval(interval);
   }, []);
+
+  const currentTotal = dailyTotal + liveGrowth;
 
   return (
     <motion.div className="premium-card" style={{ padding: '22px' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
@@ -77,13 +75,13 @@ function LiveImpactPanel({ dailyTotal }) {
 
       {/* Your personal equivalency */}
       <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-        Your <strong style={{ color: 'var(--text-primary)' }}>{formatCarbon(localDailyTotal)}</strong> today is equivalent to:
+        Your <strong style={{ color: 'var(--text-primary)' }}>{formatCarbon(currentTotal)}</strong> today is equivalent to:
       </p>
       <div className="equiv-grid-3" style={{ marginBottom: '20px' }}>
         {[
-          { icon: 'smartphone', color: '#3B82F6', bg: 'rgba(59,130,246,0.07)', val: Math.round(localDailyTotal * 121).toLocaleString(), label: 'Phones Charged' },
-          { icon: 'car', color: '#F59E0B', bg: 'rgba(245,158,11,0.07)', val: `${(localDailyTotal * 4.02).toFixed(1)} km`, label: 'Car Distance' },
-          { icon: 'tree-deciduous', color: '#10B981', bg: 'rgba(16,185,129,0.07)', val: (localDailyTotal / 21).toFixed(2), label: 'Tree Years' },
+          { icon: 'smartphone', color: '#3B82F6', bg: 'rgba(59,130,246,0.07)', val: Math.round(currentTotal * 121).toLocaleString(), label: 'Phones Charged' },
+          { icon: 'car', color: '#F59E0B', bg: 'rgba(245,158,11,0.07)', val: `${(currentTotal * 4.02).toFixed(1)} km`, label: 'Car Distance' },
+          { icon: 'tree-deciduous', color: '#10B981', bg: 'rgba(16,185,129,0.07)', val: (currentTotal / 21).toFixed(2), label: 'Tree Years' },
         ].map(c => (
           <div key={c.label} style={{ background: c.bg, border: `1px solid ${c.color}22`, padding: '12px 8px', borderRadius: '12px', textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px' }}><Icon name={c.icon} size={20} color={c.color} /></div>
@@ -336,7 +334,7 @@ function ActivityForm({ onAdd }) {
   );
 }
 
-function ActivityCard({ activity, onDelete, onEdit }) {
+function ActivityCard({ activity, onDelete }) {
   const cat = CATEGORIES[activity.category];
   return (
     <motion.div
@@ -407,7 +405,6 @@ export default function Tracker() {
   const risk = getRiskLevel(dailyTotal);
   const level = getLevel(store.totalXP);
   const scoreColor = getScoreColor(dailyScore);
-  const progressGradient = getProgressGradient(dailyScore);
   const suggestions = store.suggestions;
   const weeklyData = store.getWeeklyData();
 
@@ -454,7 +451,6 @@ export default function Tracker() {
                         key={a.id}
                         activity={a}
                         onDelete={store.deleteActivity}
-                        onEdit={store.editActivity}
                       />
                     ))}
                   </div>

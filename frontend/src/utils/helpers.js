@@ -116,3 +116,12 @@ export function getWeekNumber() {
   const yearStart = new Date(d.getFullYear(), 0, 1);
   return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
+
+/**
+ * Parse SVG Avatar ID from storage format
+ */
+export function parseSvgAvatarId(avatar) {
+  if (!avatar || typeof avatar !== 'string' || !avatar.startsWith('__svg__')) return null;
+  return avatar.replace('__svg__', '');
+}
+

@@ -13,11 +13,13 @@ export default function LiveScoreEngine() {
     const weeklyActivities = store.activities.slice(0, 20); // simplify for MVP
     const insights = generateSmartInsights(weeklyActivities);
     
-    setMessages(insights.map((ins, i) => ({
-      id: `ins-${i}`,
-      ...ins,
-      isAlert: ins.type === 'alert'
-    })));
+    Promise.resolve().then(() => {
+      setMessages(insights.map((ins, i) => ({
+        id: `ins-${i}`,
+        ...ins,
+        isAlert: ins.type === 'alert'
+      })));
+    });
   }, [store.activities]);
 
   // Listen to new activities for "Live Score" animation
@@ -35,7 +37,9 @@ export default function LiveScoreEngine() {
           type: 'live',
           isAlert: false
         };
-        setMessages(prev => [liveMsg, ...prev].slice(0, 4));
+        Promise.resolve().then(() => {
+          setMessages(prev => [liveMsg, ...prev].slice(0, 4));
+        });
       }
     }
   }, [store.activities]);
@@ -54,7 +58,7 @@ export default function LiveScoreEngine() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <AnimatePresence>
-          {messages.map((msg, i) => (
+          {messages.map((msg) => (
             <motion.div
               key={msg.id}
               initial={{ opacity: 0, x: -20, height: 0 }}

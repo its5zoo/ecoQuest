@@ -25,6 +25,7 @@ const iconMap = {
   'package': Package,
   'trash-2': Trash2,
   'newspaper': Newspaper,
+  'beef': Beef,
   'search': Search,
   'refresh-cw': RefreshCw,
   'send': Send,

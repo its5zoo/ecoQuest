@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'react-toastify';
-import { calcDailyScore, calcXP, getLevel, generateSuggestions, CATEGORIES } from '../utils/carbonLogic';
+import { calcDailyScore, getLevel, generateSuggestions, CATEGORIES } from '../utils/carbonLogic';
 
 // ── Tiered Badge System ──────────────────────────────────────
 // tier: 1=Seedling 2=Guardian 3=Champion 4=Legend 5=Apex

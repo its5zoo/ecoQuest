@@ -1,7 +1,11 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Float, Sparkles } from '@react-three/drei';
-import * as THREE from 'three';
+
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
 
 // Procedurally generated low-poly tree
 function Tree({ position, scale = 1, type = 1 }) {
@@ -116,11 +120,11 @@ export default function VirtualForest({ level = 1, plantedTrees = 0 }) {
     
     const treesData = [];
     for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2 + Math.random();
-      const r = Math.random() * (radius - 0.8) + 0.5; // Spread trees inside the new radius
+      const angle = (i / count) * Math.PI * 2 + seededRandom(i * 1.7 + 0.1);
+      const r = seededRandom(i * 2.3 + 0.5) * (radius - 0.8) + 0.5; // Spread trees inside the new radius
       treesData.push({
         position: [Math.cos(angle) * r, 0.2, Math.sin(angle) * r],
-        scale: 0.6 + Math.random() * 0.6,
+        scale: 0.6 + seededRandom(i * 3.1 + 0.9) * 0.6,
         type: i
       });
     }
@@ -128,16 +132,16 @@ export default function VirtualForest({ level = 1, plantedTrees = 0 }) {
     const propsData = [];
     if (level >= 2) {
       for(let i = 0; i < level * 2; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const r = Math.random() * (radius - 0.5);
-        propsData.push({ type: 'bush', position: [Math.cos(angle) * r, 0.2, Math.sin(angle) * r], scale: 0.5 + Math.random() * 0.5 });
+        const angle = seededRandom(i * 4.3 + 1.2) * Math.PI * 2;
+        const r = seededRandom(i * 5.7 + 2.1) * (radius - 0.5);
+        propsData.push({ type: 'bush', position: [Math.cos(angle) * r, 0.2, Math.sin(angle) * r], scale: 0.5 + seededRandom(i * 6.9 + 3.4) * 0.5 });
       }
     }
     if (level >= 3) {
       for(let i = 0; i < level; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const r = Math.random() * (radius - 0.5);
-        propsData.push({ type: 'rock', position: [Math.cos(angle) * r, 0.2, Math.sin(angle) * r], scale: 0.5 + Math.random() * 0.8 });
+        const angle = seededRandom(i * 7.1 + 4.5) * Math.PI * 2;
+        const r = seededRandom(i * 8.3 + 5.6) * (radius - 0.5);
+        propsData.push({ type: 'rock', position: [Math.cos(angle) * r, 0.2, Math.sin(angle) * r], scale: 0.5 + seededRandom(i * 9.7 + 6.7) * 0.8 });
       }
     }
 

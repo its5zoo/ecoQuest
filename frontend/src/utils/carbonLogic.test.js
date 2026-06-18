@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calcActivityCarbon, getLevel, calcDailyScore } from './carbonLogic';
-import { parseSvgAvatarId } from '../components/shared/AvatarSVG';
+import { parseSvgAvatarId } from './helpers';
 
 describe('carbonLogic', () => {
   it('calculates transport emissions', () => {

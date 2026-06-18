@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Icon from '../components/shared/Icon';
-import AvatarSVG, { parseSvgAvatarId } from '../components/shared/AvatarSVG';
+import AvatarSVG from '../components/shared/AvatarSVG';
+import { parseSvgAvatarId } from '../utils/helpers';
 import useAuthStore from '../store/authStore';
 import { fetchPosts, createPost } from '../services/socialService';
 import { fetchLeaderboard, mapLeaderboardEntry } from '../services/leaderboardService';
@@ -247,9 +248,13 @@ export default function Community() {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, scope, page, token, isAuthenticated, user?.district, user?.state, user?.id, logout]);
+  }, [activeTab, scope, page, token, isAuthenticated, user, logout]);
 
-  useEffect(() => { loadLeaderboard(); }, [loadLeaderboard]);
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      loadLeaderboard();
+    });
+  }, [loadLeaderboard]);
 
   const handleScopeChange = (s) => {
     if (s === scope) return;
@@ -272,7 +277,9 @@ export default function Community() {
         setLoadingPosts(false);
       }
     };
-    load();
+    Promise.resolve().then(() => {
+      load();
+    });
   }, [activeTab, feedScope, isAuthenticated, user]);
 
   const handleCreatePost = async (e) => {

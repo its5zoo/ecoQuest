@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
 import useTrackerStore from '../../store/trackerStore';
 import Icon from '../shared/Icon';
-import AvatarSVG, { parseSvgAvatarId } from '../shared/AvatarSVG';
+import AvatarSVG from '../shared/AvatarSVG';
+import { parseSvgAvatarId } from '../../utils/helpers';
 import { keyboardActivate } from '../../utils/a11y';
 
 function NavAvatar({ user, size = 36, onClick }) {
@@ -77,7 +78,9 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setMenuOpen(false);
+    Promise.resolve().then(() => {
+      setMenuOpen(false);
+    });
   }, [location.pathname]);
 
   const handleLogout = () => {

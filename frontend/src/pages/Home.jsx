@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import CountUpModule from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import useAuthStore from '../store/authStore';
@@ -140,30 +140,42 @@ function StatCounter({ value, suffix, label, icon, decimals }) {
 }
 
 /* ─── Floating Particles ────────────────────── */
+const HERO_PARTICLES = [...Array(18)].map((_, i) => ({
+  left: `${Math.random() * 100}%`,
+  top: `${100 + Math.random() * 20}%`,
+  width: `${3 + Math.random() * 5}px`,
+  height: `${3 + Math.random() * 5}px`,
+  bg: i % 3 === 0 ? '#00C896' : i % 3 === 1 ? '#4ADE80' : 'rgba(0,200,150,0.4)',
+  animateY: -(600 + Math.random() * 400),
+  animateX: (Math.random() - 0.5) * 150,
+  duration: 8 + Math.random() * 8,
+  delay: Math.random() * 10,
+}));
+
 function Particles() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      {[...Array(18)].map((_, i) => (
+      {HERO_PARTICLES.map((p, i) => (
         <motion.div
           key={i}
           style={{
             position: 'absolute',
-            left: `${Math.random() * 100}%`,
-            top: `${100 + Math.random() * 20}%`,
-            width: `${3 + Math.random() * 5}px`,
-            height: `${3 + Math.random() * 5}px`,
+            left: p.left,
+            top: p.top,
+            width: p.width,
+            height: p.height,
             borderRadius: '50%',
-            background: i % 3 === 0 ? '#00C896' : i % 3 === 1 ? '#4ADE80' : 'rgba(0,200,150,0.4)',
+            background: p.bg,
           }}
           animate={{
-            y: [0, -(600 + Math.random() * 400)],
-            x: [0, (Math.random() - 0.5) * 150],
+            y: [0, p.animateY],
+            x: [0, p.animateX],
             opacity: [0, 1, 1, 0],
           }}
           transition={{
-            duration: 8 + Math.random() * 8,
+            duration: p.duration,
             repeat: Infinity,
-            delay: Math.random() * 10,
+            delay: p.delay,
             ease: 'easeOut',
           }}
         />
@@ -171,6 +183,7 @@ function Particles() {
     </div>
   );
 }
+
 
 /* ─── Footprint Background ─────────────────── */
 function Footprint({ isLeft, style }) {

@@ -111,7 +111,7 @@ const MOCK_CHALLENGES = [
 
 const useSocialStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       challenges: MOCK_CHALLENGES,
       allUsers: ALL_USERS,
 

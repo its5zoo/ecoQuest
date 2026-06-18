@@ -11,7 +11,7 @@ const rawBackend = import.meta.env.VITE_API_URL
 const BACKEND = rawBackend.replace(/\/+$/, '');
 
 /* ── Gmail Validator Logic ───────────────────────────────────────────────── */
-const isValidGmail = (v) => /^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(v.trim());
+const isValidGmail = (v) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(v.trim());
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const getEmailState = (v) => {
   if (!v) return null;

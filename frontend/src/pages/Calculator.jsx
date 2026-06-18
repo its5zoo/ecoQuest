@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { calculateFootprint, getRiskLevel } from '../utils/carbonLogic';
+import { calculateFootprint } from '../utils/carbonLogic';
 import { formatCarbon } from '../utils/helpers';
 import Icon from '../components/shared/Icon';
 

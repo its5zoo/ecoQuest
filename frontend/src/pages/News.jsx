@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Icon from '../components/shared/Icon';
-import AvatarSVG, { parseSvgAvatarId } from '../components/shared/AvatarSVG';
+import AvatarSVG from '../components/shared/AvatarSVG';
+import { parseSvgAvatarId } from '../utils/helpers';
 import useAuthStore from '../store/authStore';
 
 const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e.up.railway.app/api';

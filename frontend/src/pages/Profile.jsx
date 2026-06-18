@@ -16,7 +16,8 @@ import VirtualForest from '../components/features/VirtualForest';
 import ShareCard from '../components/features/ShareCard';
 import AchievementModal from '../components/features/AchievementModal';
 import AvatarPicker from '../components/features/AvatarPicker';
-import AvatarSVG, { parseSvgAvatarId } from '../components/shared/AvatarSVG';
+import AvatarSVG from '../components/shared/AvatarSVG';
+import { parseSvgAvatarId } from '../utils/helpers';
 import { fetchMyRanks } from '../services/leaderboardService';
 
 /* ── Tier config ─────────────────────────────────────────────── */
@@ -162,7 +163,7 @@ function BadgeCard({ badge }) {
 }
 
 /* ── Level Journey Map ──────────────────────────────────────── */
-function LevelJourney({ currentLevel, totalXP }) {
+function LevelJourney({ currentLevel }) {
   const levels = [
     { level: 1,  name: 'Seedling',    minXP: 0,     emoji: '🌱' },
     { level: 2,  name: 'Sprout',      minXP: 200,   emoji: '🌿' },

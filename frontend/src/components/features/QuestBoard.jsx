@@ -28,7 +28,7 @@ export default function QuestBoard() {
       }
     }, 60000);
     return () => clearInterval(timer);
-  }, [store.questDate]);
+  }, [store.questDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClaim = (id) => {
     store.completeQuest(id);

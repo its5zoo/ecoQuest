@@ -11,11 +11,6 @@ const AVATAR_CONFIGS = {
   '5': { bg: '#FEE2E2', skin: '#FDBCB4', hair: '#5C3A1E', outfit: '#EF4444', glasses: false, braids: false, curly: false, beard: true,  earrings: false },
 };
 
-export function parseSvgAvatarId(avatar) {
-  if (!avatar || !avatar.startsWith('__svg__')) return null;
-  return avatar.replace('__svg__', '');
-}
-
 export default function AvatarSVG({ svgId }) {
   const c = AVATAR_CONFIGS[svgId] || AVATAR_CONFIGS.c1;
   return (

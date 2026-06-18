@@ -16,14 +16,18 @@ export default function AchievementModal() {
     const newlyUnlocked = store.badges.filter(b => b.unlocked && !storedShown.includes(b.id));
     
     if (newlyUnlocked.length > 0) {
-      setUnlockedQueue(prev => [...prev, ...newlyUnlocked]);
+      Promise.resolve().then(() => {
+        setUnlockedQueue(prev => [...prev, ...newlyUnlocked]);
+      });
       localStorage.setItem('shownBadges', JSON.stringify([...storedShown, ...newlyUnlocked.map(b => b.id)]));
     }
   }, [store.badges]);
 
   useEffect(() => {
     if (!currentBadge && unlockedQueue.length > 0) {
-      setCurrentBadge(unlockedQueue[0]);
+      Promise.resolve().then(() => {
+        setCurrentBadge(unlockedQueue[0]);
+      });
       
       // Fire confetti
       const duration = 3000;

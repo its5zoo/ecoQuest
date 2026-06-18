@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import useAuthStore from '../../store/authStore';
 
@@ -104,7 +104,7 @@ const PRESET_AVATARS = [
 ];
 
 export default function AvatarPicker({ onClose }) {
-  const { user, updateUser } = useAuthStore();
+  const { updateUser } = useAuthStore();
   const [selected, setSelected] = useState(null);
   const [customImg, setCustomImg] = useState(null);
   const fileRef = useRef();
