@@ -337,7 +337,7 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
 
   return (
     <div style={{ position: 'absolute', top: 'calc(50% - 600px)', left: 'calc(50% - 600px)', width: '1200px', height: '1200px', pointerEvents: 'none', zIndex: 30 }}>
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
     </div>
   );
 }
