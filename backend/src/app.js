@@ -38,6 +38,7 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
     'https://ecoquesteits5zoo.up.railway.app',
+    'https://ecoquest5zoo.netlify.app',
     'http://localhost:5173'
   ].filter(Boolean),
   credentials: true,

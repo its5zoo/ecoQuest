@@ -1,6 +1,8 @@
 import useAuthStore from '../store/authStore';
 
-const BACKEND = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const rawApi = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const cleanApi = rawApi.replace(/\/+$/, '');
+const BACKEND = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
 
 export const fetchPosts = async (scope, district, state) => {
   const token = useAuthStore.getState().token;

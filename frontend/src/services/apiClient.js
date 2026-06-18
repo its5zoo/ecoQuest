@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const rawApi = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const cleanApi = rawApi.replace(/\/+$/, '');
+const API_BASE = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
 
 /**
  * Central fetch wrapper.

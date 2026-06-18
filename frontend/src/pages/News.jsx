@@ -5,7 +5,9 @@ import Icon from '../components/shared/Icon';
 import AvatarSVG, { parseSvgAvatarId } from '../components/shared/AvatarSVG';
 import useAuthStore from '../store/authStore';
 
-const API = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const rawApi = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
+const cleanApi = rawApi.replace(/\/+$/, '');
+const API = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
 
 /* ── Suggestion chips shown when chat is empty ─────────────── */
 const SUGGESTIONS = [
