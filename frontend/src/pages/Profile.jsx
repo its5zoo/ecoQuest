@@ -227,6 +227,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, isAuthenticated, updateUser, token } = useAuthStore();
   const store = useTrackerStore();
+  const socialStore = useSocialStore();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', bio: '', district: '', state: '', country: '' });
@@ -279,16 +280,37 @@ export default function Profile() {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
+        <Icon name="lock" size={64} color="#00C896" />
+        <h2 style={{ fontWeight: 800, fontSize: '1.5rem' }}>Login to View Your Profile</h2>
+        <p style={{ color: 'var(--text-muted)', maxWidth: '360px' }}>Track your eco-journey, earn badges, and see your impact.</p>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <motion.button className="btn-primary" onClick={() => navigate('/login?redirect=%2Fprofile')} whileHover={{ scale: 1.05 }}>Login</motion.button>
+          <motion.button className="btn-outline" onClick={() => navigate('/signup')} whileHover={{ scale: 1.05 }}>Sign Up Free</motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div role="status" aria-live="polite" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+        Loading Profile…
+      </div>
+    );
+  }
+
   const level    = getLevel(store.totalXP);
   const userTier = getTierByXP(store.totalXP);
   const weeklyData   = store.getWeeklyData();
   const allActivities = store.activities;
   const totalCarbon  = allActivities.reduce((s, a) => s + a.carbonKg, 0);
 
-  const socialStore    = useSocialStore();
-  const districtBoard  = socialStore.getLeaderboard('District', store.totalXP, user?.name, user?.avatar, user?.district);
-  const stateBoard     = socialStore.getLeaderboard('State',    store.totalXP, user?.name, user?.avatar, user?.district);
-  const nationalBoard  = socialStore.getLeaderboard('Country',  store.totalXP, user?.name, user?.avatar, user?.district);
+  const districtBoard  = socialStore.getLeaderboard('District', store.totalXP, user.name, user.avatar, user.district);
+  const stateBoard     = socialStore.getLeaderboard('State',    store.totalXP, user.name, user.avatar, user.district);
+  const nationalBoard  = socialStore.getLeaderboard('Country',  store.totalXP, user.name, user.avatar, user.district);
 
   const getMyRank = (board) => board.find(u => u.id === 'me')?.rank ?? '-';
   const dynamicRanks = [
@@ -303,20 +325,6 @@ export default function Profile() {
     tierInfo: TIERS.find(ti => ti.tier === t),
     badges: store.badges.filter(b => b.tier === t),
   }));
-
-  if (!isAuthenticated) {
-    return (
-      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
-        <Icon name="lock" size={64} color="#00C896" />
-        <h2 style={{ fontWeight: 800, fontSize: '1.5rem' }}>Login to View Your Profile</h2>
-        <p style={{ color: 'var(--text-muted)', maxWidth: '360px' }}>Track your eco-journey, earn badges, and see your impact.</p>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <motion.button className="btn-primary" onClick={() => navigate('/login?redirect=%2Fprofile')} whileHover={{ scale: 1.05 }}>Login</motion.button>
-          <motion.button className="btn-outline" onClick={() => navigate('/signup')} whileHover={{ scale: 1.05 }}>Sign Up Free</motion.button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#F0FDF4' }}>
