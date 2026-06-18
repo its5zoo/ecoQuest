@@ -65,7 +65,7 @@ export default function OAuthCallback() {
       // → clicked Google → we stored the redirect in sessionStorage → restore it now
       const savedRedirect = sessionStorage.getItem('oauth_redirect');
       sessionStorage.removeItem('oauth_redirect');
-      navigate(savedRedirect || '/profile', { replace: true });
+      navigate(savedRedirect || '/', { replace: true });
     };
 
     run();

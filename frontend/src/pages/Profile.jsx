@@ -492,84 +492,9 @@ export default function Profile() {
             <StatCard icon="star"           value={store.coins}    label="Coins Earned"     color="#8B5CF6" />
           </motion.div>
 
-          {/* ── Rankings Card (prominent) ───────────────────── */}
-          <motion.div className="premium-card" style={{ padding: '24px' }}
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="trophy" size={20} color="#F59E0B" /> Your Rankings
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px' }}>
-              {dynamicRanks.map(r => (
-                <motion.div key={r.scope} whileHover={{ y: -3, scale: 1.02 }}
-                  style={{ padding: '20px 16px', borderRadius: '16px', background: `${r.color}0D`, border: `1.5px solid ${r.color}30`, textAlign: 'center' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '6px' }}>{r.emoji}</div>
-                  <div style={{ fontSize: '2.2rem', fontWeight: 900, color: r.color, lineHeight: 1 }}>#{r.rank}</div>
-                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginTop: '6px' }}>{r.scope}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>of {r.total.toLocaleString()} users</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* ── Level Journey ───────────────────────────────── */}
-          <motion.div className="premium-card" style={{ padding: '24px' }}
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="map" size={18} color={userTier.color} /> Your Eco Journey — Level {level.level} of 10
-            </h3>
-            <LevelJourney currentLevel={level.level} totalXP={store.totalXP} />
-          </motion.div>
-
-          {/* ── Virtual Forest ─────────────────────────────── */}
-          <motion.div className="premium-card" style={{ padding: '24px' }}
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-              <h3 className="text-card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Icon name="tree-deciduous" size={20} color="var(--primary)" /> Virtual Forest
-              </h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '0.88rem', color: 'var(--primary)', fontWeight: 700 }}>Level {store.forestLevel}</span>
-                <div style={{ background: '#FEF3C7', padding: '4px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <Icon name="star" color="#D97706" size={14} />
-                  <span style={{ fontWeight: 700, color: '#D97706', fontSize: '0.9rem' }}>{store.coins}</span>
-                </div>
-              </div>
-            </div>
-            <VirtualForest level={store.forestLevel} plantedTrees={store.plantedTrees} />
-            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePlantTree}
-                style={{ background: 'linear-gradient(90deg, #10B981, #059669)', border: 'none', padding: '12px 28px', borderRadius: '10px', color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', opacity: store.coins >= treeCost ? 1 : 0.65, boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
-                <Icon name="sprout" size={18} /> Plant a Tree ({treeCost} Coins)
-              </motion.button>
-            </div>
-          </motion.div>
-
-          {/* ── Carbon Chart ────────────────────────────────── */}
-          <motion.div className="premium-card" style={{ padding: '24px' }}
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Icon name="trending-up" size={18} color="var(--primary)" /> Weekly Carbon Trend
-            </h3>
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={weeklyData}>
-                <defs>
-                  <linearGradient id="carbonGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#10B981" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}   />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
-                <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '10px' }} labelStyle={{ color: 'var(--text-primary)', fontWeight: 600 }} itemStyle={{ color: 'var(--primary)', fontWeight: 700 }} />
-                <Area type="monotone" dataKey="carbon" name="kg CO₂" stroke="#10B981" strokeWidth={3} fill="url(#carbonGrad)" dot={{ fill: '#10B981', r: 4, strokeWidth: 2, stroke: '#FFFFFF' }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </motion.div>
-
           {/* ── Badge Gallery (by tier) ──────────────────────── */}
           <motion.div className="premium-card" style={{ padding: '24px' }}
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <h3 className="text-card-title" style={{ marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Icon name="medal" size={18} color="#8B5CF6" /> Badge Collection
             </h3>
@@ -599,6 +524,81 @@ export default function Profile() {
                 </div>
               ))}
             </div>
+          </motion.div>
+
+          {/* ── Rankings Card (prominent) ───────────────────── */}
+          <motion.div className="premium-card" style={{ padding: '24px' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icon name="trophy" size={20} color="#F59E0B" /> Your Rankings
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px' }}>
+              {dynamicRanks.map(r => (
+                <motion.div key={r.scope} whileHover={{ y: -3, scale: 1.02 }}
+                  style={{ padding: '20px 16px', borderRadius: '16px', background: `${r.color}0D`, border: `1.5px solid ${r.color}30`, textAlign: 'center' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '6px' }}>{r.emoji}</div>
+                  <div style={{ fontSize: '2.2rem', fontWeight: 900, color: r.color, lineHeight: 1 }}>#{r.rank}</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', marginTop: '6px' }}>{r.scope}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>of {r.total.toLocaleString()} users</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* ── Level Journey ───────────────────────────────── */}
+          <motion.div className="premium-card" style={{ padding: '24px' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icon name="map" size={18} color={userTier.color} /> Your Eco Journey — Level {level.level} of 10
+            </h3>
+            <LevelJourney currentLevel={level.level} totalXP={store.totalXP} />
+          </motion.div>
+
+          {/* ── Virtual Forest ─────────────────────────────── */}
+          <motion.div className="premium-card" style={{ padding: '24px' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+              <h3 className="text-card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Icon name="tree-deciduous" size={20} color="var(--primary)" /> Virtual Forest
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '0.88rem', color: 'var(--primary)', fontWeight: 700 }}>Level {store.forestLevel}</span>
+                <div style={{ background: '#FEF3C7', padding: '4px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icon name="star" color="#D97706" size={14} />
+                  <span style={{ fontWeight: 700, color: '#D97706', fontSize: '0.9rem' }}>{store.coins}</span>
+                </div>
+              </div>
+            </div>
+            <VirtualForest level={store.forestLevel} plantedTrees={store.plantedTrees} />
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePlantTree}
+                style={{ background: 'linear-gradient(90deg, #10B981, #059669)', border: 'none', padding: '12px 28px', borderRadius: '10px', color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', opacity: store.coins >= treeCost ? 1 : 0.65, boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
+                <Icon name="sprout" size={18} /> Plant a Tree ({treeCost} Coins)
+              </motion.button>
+            </div>
+          </motion.div>
+
+          {/* ── Carbon Chart ────────────────────────────────── */}
+          <motion.div className="premium-card" style={{ padding: '24px' }}
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icon name="trending-up" size={18} color="var(--primary)" /> Weekly Carbon Trend
+            </h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={weeklyData}>
+                <defs>
+                  <linearGradient id="carbonGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#10B981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}   />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
+                <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '10px' }} labelStyle={{ color: 'var(--text-primary)', fontWeight: 600 }} itemStyle={{ color: 'var(--primary)', fontWeight: 700 }} />
+                <Area type="monotone" dataKey="carbon" name="kg CO₂" stroke="#10B981" strokeWidth={3} fill="url(#carbonGrad)" dot={{ fill: '#10B981', r: 4, strokeWidth: 2, stroke: '#FFFFFF' }} />
+              </AreaChart>
+            </ResponsiveContainer>
           </motion.div>
 
         </div>

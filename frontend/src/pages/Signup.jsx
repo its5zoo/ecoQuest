@@ -260,9 +260,9 @@ export default function Signup() {
 
     if (result.success) {
       toast.success(isLogin ? '🌿 Welcome back to EcoQuest!' : '🎉 Welcome to EcoQuest! Your journey begins!');
-      // Redirect to the page the user was trying to visit, or /profile as default
+      // Redirect to the page the user was trying to visit, or / as default
       const redirectTo = searchParams.get('redirect');
-      navigate(redirectTo ? decodeURIComponent(redirectTo) : '/profile', { replace: true });
+      navigate(redirectTo ? decodeURIComponent(redirectTo) : '/', { replace: true });
     } else {
       toast.error(result.message || 'Something went wrong. Please try again.');
     }

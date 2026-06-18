@@ -72,7 +72,7 @@ function GuestOnlyRoute({ children }) {
   const redirectTo = new URLSearchParams(location.search).get('redirect');
 
   if (isAuthenticated && getToken()) {
-    return <Navigate to={redirectTo ? decodeURIComponent(redirectTo) : '/profile'} replace />;
+    return <Navigate to={redirectTo ? decodeURIComponent(redirectTo) : '/'} replace />;
   }
 
   return children;
