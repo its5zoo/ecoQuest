@@ -271,12 +271,15 @@ export default function Profile() {
     }
   };
 
-  const treeCost = store.forestLevel * 50;
+  const treeCost = (store.forestLevel || 1) * 50;
   const handlePlantTree = () => {
-    if (store.coins >= treeCost) {
-      if (store.plantTree()) toast.success('🌱 You planted a new tree in your Virtual Forest!');
+    const currentCoins = store.coins || 0;
+    if (currentCoins >= treeCost) {
+      if (typeof store.plantTree === 'function' && store.plantTree()) {
+        toast.success('🌱 You planted a new tree in your Virtual Forest!');
+      }
     } else {
-      toast.warning(`You need ${treeCost - store.coins} more coins to plant a tree!`);
+      toast.warning(`You need ${treeCost - currentCoins} more coins to plant a tree!`);
     }
   };
 
@@ -302,17 +305,24 @@ export default function Profile() {
     );
   }
 
-  const level    = getLevel(store.totalXP);
-  const userTier = getTierByXP(store.totalXP);
-  const weeklyData   = store.getWeeklyData();
-  const allActivities = store.activities;
-  const totalCarbon  = allActivities.reduce((s, a) => s + a.carbonKg, 0);
+  const currentXP = store.totalXP || 0;
+  const level    = getLevel(currentXP);
+  const userTier = getTierByXP(currentXP);
+  const weeklyData   = typeof store.getWeeklyData === 'function' ? store.getWeeklyData() : [];
+  const allActivities = store.activities || [];
+  const totalCarbon  = allActivities.reduce((s, a) => s + (a.carbonKg || 0), 0);
 
-  const districtBoard  = socialStore.getLeaderboard('District', store.totalXP, user.name, user.avatar, user.district);
-  const stateBoard     = socialStore.getLeaderboard('State',    store.totalXP, user.name, user.avatar, user.district);
-  const nationalBoard  = socialStore.getLeaderboard('Country',  store.totalXP, user.name, user.avatar, user.district);
+  const districtBoard  = typeof socialStore.getLeaderboard === 'function'
+    ? socialStore.getLeaderboard('District', currentXP, user.name, user.avatar, user.district)
+    : [];
+  const stateBoard     = typeof socialStore.getLeaderboard === 'function'
+    ? socialStore.getLeaderboard('State',    currentXP, user.name, user.avatar, user.district)
+    : [];
+  const nationalBoard  = typeof socialStore.getLeaderboard === 'function'
+    ? socialStore.getLeaderboard('Country',  currentXP, user.name, user.avatar, user.district)
+    : [];
 
-  const getMyRank = (board) => board.find(u => u.id === 'me')?.rank ?? '-';
+  const getMyRank = (board) => (board || []).find(u => u.id === 'me')?.rank ?? '-';
   const dynamicRanks = [
     { scope: 'District',  rank: myRanks?.district?.rank ?? getMyRank(districtBoard),  total: myRanks?.district?.total ?? 50,  icon: 'home',  color: '#06B6D4', emoji: '🏘️' },
     { scope: 'State',     rank: myRanks?.state?.rank ?? getMyRank(stateBoard),        total: myRanks?.state?.total ?? 500,    icon: 'map',   color: '#8B5CF6', emoji: '🗺️' },
@@ -323,7 +333,7 @@ export default function Profile() {
   const badgesByTier = [1,2,3,4,5].map(t => ({
     tier: t,
     tierInfo: TIERS.find(ti => ti.tier === t),
-    badges: store.badges.filter(b => b.tier === t),
+    badges: (store.badges || []).filter(b => b.tier === t),
   }));
 
   return (
@@ -456,7 +466,7 @@ export default function Profile() {
                     <Icon name="leaf" size={13} />{level.name} • {userTier.name} Tier
                   </div>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, background: '#FEF3C7', border: '1px solid #FDE68A', color: '#B45309' }}>
-                    <Icon name="flame" size={13} />{store.streak} Day Streak
+                    <Icon name="flame" size={13} />{store.streak || 0} Day Streak
                   </div>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700, background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#475569' }}>
                     <Icon name="calendar" size={13} />Joined {formatDate(user.joinDate, { month: 'short', year: 'numeric' })}
@@ -469,7 +479,7 @@ export default function Profile() {
             <div style={{ minWidth: '220px', flex: '1 1 220px', background: '#FFFFFF', padding: '20px', borderRadius: '16px', border: `1.5px solid ${userTier.border}`, boxShadow: `0 4px 20px ${userTier.glow}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                 <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 700 }}>Level Progress</span>
-                <span style={{ fontSize: '0.82rem', color: userTier.color, fontWeight: 800 }}>{store.totalXP} / {level.maxXP} XP</span>
+                <span style={{ fontSize: '0.82rem', color: userTier.color, fontWeight: 800 }}>{store.totalXP || 0} / {level.maxXP || 200} XP</span>
               </div>
               <div style={{ height: '10px', borderRadius: '8px', background: `${userTier.color}20`, overflow: 'hidden', marginBottom: '14px' }}>
                 <motion.div
@@ -480,7 +490,7 @@ export default function Profile() {
                 />
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                {Math.round(Math.max(0, ((store.totalXP - level.minXP) / (level.maxXP - level.minXP)) * 100))}% to next level — {Math.max(0, level.maxXP - store.totalXP)} XP needed
+                {Math.round(Math.max(0, (((store.totalXP || 0) - (level.minXP || 0)) / ((level.maxXP || 200) - (level.minXP || 0))) * 100))}% to next level — {Math.max(0, (level.maxXP || 200) - (store.totalXP || 0))} XP needed
               </div>
               <ShareCard />
             </div>
@@ -497,8 +507,8 @@ export default function Profile() {
             className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard icon="clipboard-list" value={allActivities.length} label="Activities Logged" color="#3B82F6" />
             <StatCard icon="wind"           value={formatCarbon(totalCarbon)} label="Total Emissions"  color="#EF4444" />
-            <StatCard icon="zap"            value={store.totalXP}  label="XP Earned"        color="#F59E0B" />
-            <StatCard icon="star"           value={store.coins}    label="Coins Earned"     color="#8B5CF6" />
+            <StatCard icon="zap"            value={store.totalXP || 0}  label="XP Earned"        color="#F59E0B" />
+            <StatCard icon="star"           value={store.coins || 0}    label="Coins Earned"     color="#8B5CF6" />
           </motion.div>
 
           {/* ── Badge Gallery (by tier) ──────────────────────── */}
@@ -560,7 +570,7 @@ export default function Profile() {
             <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Icon name="map" size={18} color={userTier.color} /> Your Eco Journey — Level {level.level} of 10
             </h3>
-            <LevelJourney currentLevel={level.level} totalXP={store.totalXP} />
+            <LevelJourney currentLevel={level.level} totalXP={store.totalXP || 0} />
           </motion.div>
 
           {/* ── Virtual Forest ─────────────────────────────── */}
@@ -571,17 +581,17 @@ export default function Profile() {
                 <Icon name="tree-deciduous" size={20} color="var(--primary)" /> Virtual Forest
               </h3>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '0.88rem', color: 'var(--primary)', fontWeight: 700 }}>Level {store.forestLevel}</span>
+                <span style={{ fontSize: '0.88rem', color: 'var(--primary)', fontWeight: 700 }}>Level {store.forestLevel || 1}</span>
                 <div style={{ background: '#FEF3C7', padding: '4px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Icon name="star" color="#D97706" size={14} />
-                  <span style={{ fontWeight: 700, color: '#D97706', fontSize: '0.9rem' }}>{store.coins}</span>
+                  <span style={{ fontWeight: 700, color: '#D97706', fontSize: '0.9rem' }}>{store.coins || 0}</span>
                 </div>
               </div>
             </div>
-            <VirtualForest level={store.forestLevel} plantedTrees={store.plantedTrees} />
+            <VirtualForest level={store.forestLevel || 1} plantedTrees={store.plantedTrees || 0} />
             <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePlantTree}
-                style={{ background: 'linear-gradient(90deg, #10B981, #059669)', border: 'none', padding: '12px 28px', borderRadius: '10px', color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', opacity: store.coins >= treeCost ? 1 : 0.65, boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
+                style={{ background: 'linear-gradient(90deg, #10B981, #059669)', border: 'none', padding: '12px 28px', borderRadius: '10px', color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', opacity: (store.coins || 0) >= treeCost ? 1 : 0.65, boxShadow: '0 4px 12px rgba(16,185,129,0.25)' }}>
                 <Icon name="sprout" size={18} /> Plant a Tree ({treeCost} Coins)
               </motion.button>
             </div>

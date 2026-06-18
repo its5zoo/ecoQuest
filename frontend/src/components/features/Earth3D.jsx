@@ -151,9 +151,9 @@ export default function Earth3D({ animPhase = 0, earthContainerRef }) {
   }, [ready, earthContainerRef]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent', touchAction: 'none' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent', touchAction: 'pan-y' }}>
       {ready && (
-        <Canvas key={retryKey} camera={{ position: [0, 0, 40], fov: 30 }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'none' }}>
+        <Canvas key={retryKey} camera={{ position: [0, 0, 40], fov: 30 }} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', touchAction: 'pan-y' }}>
           <React.Suspense fallback={null}>
             <RealisticEarth animPhase={animPhase} />
           </React.Suspense>

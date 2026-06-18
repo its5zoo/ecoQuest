@@ -521,7 +521,7 @@ export default function Home() {
                   width: '100%',
                   height: '100%',
                   zIndex: 20,
-                  touchAction: 'none'
+                  touchAction: 'pan-y'
                 }}
               >
                 <Earth3D animPhase={animPhase} earthContainerRef={earthContainerRef} />
