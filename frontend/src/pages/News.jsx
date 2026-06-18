@@ -105,25 +105,49 @@ function EcoGuideAvatar({ size = 36 }) {
   return (
     <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(16,185,129,0.4)', boxShadow: '0 0 0 3px rgba(16,185,129,0.12)' }}>
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-        <circle cx="50" cy="50" r="50" fill="#ECFDF5" />
-        {/* Body */}
-        <ellipse cx="50" cy="85" rx="28" ry="18" fill="#065F46" />
-        {/* Head */}
-        <ellipse cx="50" cy="46" rx="20" ry="22" fill="#D1FAE5" />
-        {/* Leaf antenna */}
-        <path d="M50 24 C44 14 36 12 38 20 C40 28 50 26 50 24Z" fill="#10B981" />
-        <path d="M50 24 C56 14 64 12 62 20 C60 28 50 26 50 24Z" fill="#059669" />
-        <line x1="50" y1="24" x2="50" y2="30" stroke="#065F46" strokeWidth="1.5" />
-        {/* Eyes */}
-        <circle cx="42" cy="46" r="4" fill="#065F46" />
-        <circle cx="58" cy="46" r="4" fill="#065F46" />
-        <circle cx="43.5" cy="44.5" r="1.5" fill="white" />
-        <circle cx="59.5" cy="44.5" r="1.5" fill="white" />
-        {/* Smile */}
-        <path d="M42 55 Q50 62 58 55" stroke="#065F46" strokeWidth="2" fill="none" strokeLinecap="round" />
-        {/* AI badge */}
-        <rect x="36" y="70" width="28" height="12" rx="6" fill="#10B981" />
-        <text x="50" y="79.5" textAnchor="middle" fill="white" fontSize="7" fontWeight="800" fontFamily="sans-serif">AI</text>
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#022c22" />
+            <stop offset="100%" stopColor="#064e3b" />
+          </linearGradient>
+          <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="60%" stopColor="#f0fdf4" />
+            <stop offset="100%" stopColor="#cbd5e1" />
+          </linearGradient>
+          <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#047857" />
+            <stop offset="100%" stopColor="#064e3b" />
+          </linearGradient>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+          <linearGradient id="leafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#34d399" />
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="url(#bgGrad)" stroke="#10b981" strokeWidth="2" />
+        <path d="M25 88 C 25 70, 75 70, 75 88 Z" fill="url(#metalGrad)" />
+        <path d="M40 70 L60 70 L55 77 L45 77 Z" fill="#94a3b8" />
+        <rect x="30" y="32" width="40" height="36" rx="18" fill="url(#metalGrad)" />
+        <rect x="34" y="36" width="32" height="24" rx="10" fill="url(#visorGrad)" />
+        <path d="M34 46 C34 40, 66 40, 66 46 C66 42, 34 42, 34 46 Z" fill="rgba(255, 255, 255, 0.15)" />
+        <path d="M38 38 Q 45 42, 62 38" stroke="rgba(255, 255, 255, 0.25)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <circle cx="43" cy="48" r="3.5" fill="#34d399" filter="url(#glow)" />
+        <circle cx="57" cy="48" r="3.5" fill="#34d399" filter="url(#glow)" />
+        <circle cx="44.5" cy="46.5" r="1" fill="#ffffff" />
+        <circle cx="58.5" cy="46.5" r="1" fill="#ffffff" />
+        <path d="M46 54 Q 50 57, 54 54" stroke="#34d399" strokeWidth="2" fill="none" strokeLinecap="round" filter="url(#glow)" />
+        <circle cx="38" cy="52" r="1.5" fill="#f43f5e" opacity="0.6" filter="url(#glow)" />
+        <circle cx="62" cy="52" r="1.5" fill="#f43f5e" opacity="0.6" filter="url(#glow)" />
+        <path d="M50 32 Q 50 22, 46 16" stroke="#64748b" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M50 32 Q 50 22, 54 16" stroke="#475569" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M46 16 C 38 12, 34 18, 46 16 Z" fill="url(#leafGrad)" filter="url(#glow)" />
+        <path d="M54 16 C 62 12, 66 18, 54 16 Z" fill="url(#leafGrad)" filter="url(#glow)" opacity="0.9" />
+        <rect x="42" y="70" width="16" height="8" rx="4" fill="#10b981" />
+        <text x="50" y="76.5" textAnchor="middle" fill="#ffffff" fontSize="5.5" fontWeight="900" fontFamily="sans-serif">AI</text>
       </svg>
     </div>
   );
@@ -281,9 +305,9 @@ export default function News() {
                 <EcoGuideAvatar size={80} />
               </motion.div>
 
-              <h2 style={{ fontWeight: 900, fontSize: '1.3rem', color: '#065F46', marginBottom: '8px' }}>Ask EcoGuide Anything!</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '400px', lineHeight: 1.6, marginBottom: '28px' }}>
-                I'm your dedicated environmental AI. Ask me about climate change, carbon footprint, pollution, renewable energy, biodiversity, or any eco topic!
+              <h2 style={{ fontWeight: 800, fontSize: '1.8rem', color: '#022c22', marginBottom: '8px', letterSpacing: '-0.025em', fontFamily: 'var(--font-heading)' }}>Ask EcoGuide Anything!</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '480px', lineHeight: 1.6, marginBottom: '28px', fontFamily: 'var(--font-body)' }}>
+                I'm your dedicated environmental AI assistant. Ask me about climate change, carbon footprint, pollution, renewable energy, biodiversity, or any eco topic!
               </p>
 
               {/* Suggestion chips */}
@@ -291,12 +315,12 @@ export default function News() {
                 {SUGGESTIONS.map((s, i) => (
                   <motion.button key={i}
                     initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                    whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.03, y: -1, background: '#ffffff', borderColor: 'rgba(16,185,129,0.4)', boxShadow: '0 6px 16px rgba(6,78,59,0.08)' }} whileTap={{ scale: 0.97 }}
                     onClick={() => sendMessage(s.text)}
-                    style={{ padding: '10px 14px', borderRadius: '16px', border: '1.5px solid rgba(16,185,129,0.2)', background: '#FFFFFF', color: '#065F46', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 6px rgba(6,78,59,0.04)', transition: 'all 0.2s', width: '100%', justifyContent: 'flex-start' }}
+                    style={{ padding: '12px 16px', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.15)', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: '#022c22', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(6,78,59,0.03)', transition: 'all 0.25s ease', width: '100%', justifyContent: 'flex-start' }}
                   >
                     <span style={{ fontSize: '1.1rem' }}>{s.icon}</span>
-                    <span style={{ textAlign: 'left', lineHeight: 1.2 }}>{s.text}</span>
+                    <span style={{ textAlign: 'left', lineHeight: 1.25 }}>{s.text}</span>
                   </motion.button>
                 ))}
               </div>
