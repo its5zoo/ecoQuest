@@ -312,7 +312,7 @@ export default function News() {
           {/* Empty state */}
           {isEmpty && !loading && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '32px 16px' }}>
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '24px 16px 32px 16px', margin: 'auto 0', width: '100%' }}>
 
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                 style={{ marginBottom: '20px' }}>
@@ -433,7 +433,7 @@ export default function News() {
               disabled={isTyping}
               rows={1}
               style={{
-                width: '100%', padding: '13px 18px', borderRadius: '14px',
+                width: '100%', padding: '8px 14px', borderRadius: '10px',
                 border: '1.5px solid rgba(0,0,0,0.1)', fontSize: '0.92rem',
                 outline: 'none', resize: 'none', overflowY: 'auto',
                 fontFamily: 'inherit', lineHeight: 1.5, color: 'var(--text-primary)',
@@ -458,7 +458,7 @@ export default function News() {
             disabled={!input.trim() || isTyping}
             aria-label="Send message"
             style={{
-              width: '48px', height: '48px', borderRadius: '14px', border: 'none', cursor: input.trim() ? 'pointer' : 'not-allowed',
+              width: '40px', height: '40px', borderRadius: '10px', border: 'none', cursor: input.trim() ? 'pointer' : 'not-allowed',
               background: input.trim() ? 'linear-gradient(135deg, #10B981, #059669)' : '#E2E8F0',
               color: input.trim() ? '#FFFFFF' : '#94A3B8',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -467,13 +467,13 @@ export default function News() {
             }}
           >
             {isTyping
-              ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><Icon name="loader" size={20} /></motion.div>
-              : <Icon name="send" size={20} />
+              ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><Icon name="loader" size={18} /></motion.div>
+              : <Icon name="send" size={18} />
             }
           </motion.button>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '6px' }}>
           EcoGuide only answers environmental topics • Chat saved to your account • Press Enter to send
         </p>
       </div>
