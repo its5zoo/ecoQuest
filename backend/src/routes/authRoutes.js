@@ -7,7 +7,7 @@ const { registerUser, loginUser, exchangeOAuthCode, getMe, updateMe } = require(
 const { protect } = require('../middleware/authMiddleware');
 const { authLimiter } = require('../middleware/rateLimiter');
 
-const FRONTEND = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND = process.env.FRONTEND_URL || 'https://ecoquesteits5zoo.up.railway.app';
 
 router.post('/signup', authLimiter, registerUser);
 router.post('/login', authLimiter, loginUser);

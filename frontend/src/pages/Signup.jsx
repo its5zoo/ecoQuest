@@ -7,7 +7,7 @@ import Icon from '../components/shared/Icon';
 
 const BACKEND = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.replace('/api', '')
-  : 'http://localhost:5000';
+  : 'https://carbonfootprint-production-636f.up.railway.app';
 
 /* ── Gmail Validator Logic ───────────────────────────────────────────────── */
 const isValidGmail = (v) => /^[a-zA-Z0-9._%+\-]+@gmail\.com$/.test(v.trim());
