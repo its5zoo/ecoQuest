@@ -248,11 +248,13 @@ const useTrackerStore = create(
                           ...currentUser,
                           xp: backendData.scoreUpdate.newTotalXp,
                           level: backendData.scoreUpdate.newLevel,
+                          streak: backendData.scoreUpdate.newStreak,
                         }
                       });
                     }
                     set({
                       totalXP: backendData.scoreUpdate.newTotalXp,
+                      streak: backendData.scoreUpdate.newStreak,
                     });
                   }
                 }).catch(err => {

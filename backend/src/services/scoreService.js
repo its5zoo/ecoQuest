@@ -46,7 +46,27 @@ class ScoreService {
     if (user) {
       user.xp += xpDifference;
       user.level = getLevelFromXP(user.xp);
-      // user.carbonSaved could be calculated relative to a benchmark
+      
+      // Streak Calculation
+      const todayStr = new Date().toDateString();
+      const lastActiveStr = user.lastActive ? new Date(user.lastActive).toDateString() : null;
+
+      if (!user.streak || user.streak === 0) {
+        user.streak = 1;
+        user.lastActive = new Date();
+      } else if (lastActiveStr !== todayStr) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toDateString();
+
+        if (lastActiveStr === yesterdayStr) {
+          user.streak = user.streak + 1;
+        } else {
+          user.streak = 1;
+        }
+        user.lastActive = new Date();
+      }
+      
       await user.save();
     }
 
@@ -54,7 +74,8 @@ class ScoreService {
       newScore,
       xpEarnedToday: newXPEarned,
       newTotalXp: user ? user.xp : 0,
-      newLevel: user ? user.level : 1
+      newLevel: user ? user.level : 1,
+      newStreak: user ? user.streak : 0
     };
   }
 }
