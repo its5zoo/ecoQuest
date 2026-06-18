@@ -1,6 +1,6 @@
 import useAuthStore from '../store/authStore';
 
-const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BACKEND = import.meta.env.VITE_API_URL || 'https://carbonfootprint-production-636f.up.railway.app/api';
 
 export const fetchPosts = async (scope, district, state) => {
   const token = useAuthStore.getState().token;
