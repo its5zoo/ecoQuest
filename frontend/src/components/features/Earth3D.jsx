@@ -150,6 +150,20 @@ export default function Earth3D({ animPhase = 0, earthContainerRef }) {
     }
   }, [ready, earthContainerRef]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.stopPropagation();
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: true });
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [ready]);
+
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent', touchAction: 'pan-y' }}>
       {ready && (
