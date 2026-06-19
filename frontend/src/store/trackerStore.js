@@ -99,18 +99,18 @@ const useTrackerStore = create(
       get dailyScore() {
         const today = new Date().toDateString();
         const todayActivities = get().activities.filter(
-          a => new Date(a.timestamp).toDateString() === today
+          a => new Date(a.timestamp || Date.now()).toDateString() === today
         );
-        const totalKg = todayActivities.reduce((sum, a) => sum + a.carbonKg, 0);
+        const totalKg = todayActivities.reduce((sum, a) => sum + (a.carbonKg || 0), 0);
         return calcDailyScore(totalKg);
       },
 
       get dailyTotal() {
         const today = new Date().toDateString();
         const todayActivities = get().activities.filter(
-          a => new Date(a.timestamp).toDateString() === today
+          a => new Date(a.timestamp || Date.now()).toDateString() === today
         );
-        return todayActivities.reduce((sum, a) => sum + a.carbonKg, 0);
+        return todayActivities.reduce((sum, a) => sum + (a.carbonKg || 0), 0);
       },
 
       get level() {
@@ -397,9 +397,9 @@ const useTrackerStore = create(
           date.setDate(date.getDate() - i);
           const dateStr = date.toDateString();
           const dayActivities = get().activities.filter(
-            a => new Date(a.timestamp).toDateString() === dateStr
+            a => new Date(a.timestamp || Date.now()).toDateString() === dateStr
           );
-          const total = dayActivities.reduce((sum, a) => sum + a.carbonKg, 0);
+          const total = dayActivities.reduce((sum, a) => sum + (a.carbonKg || 0), 0);
           days.push({
             day: date.toLocaleDateString('en', { weekday: 'short' }),
             carbon: parseFloat(total.toFixed(2)),
@@ -412,12 +412,12 @@ const useTrackerStore = create(
       getCategoryBreakdown: () => {
         const today = new Date().toDateString();
         const todayActivities = get().activities.filter(
-          a => new Date(a.timestamp).toDateString() === today
+          a => new Date(a.timestamp || Date.now()).toDateString() === today
         );
         const breakdown = {};
         todayActivities.forEach(a => {
           if (!breakdown[a.category]) breakdown[a.category] = 0;
-          breakdown[a.category] += a.carbonKg;
+          breakdown[a.category] += (a.carbonKg || 0);
         });
         return Object.entries(breakdown).map(([cat, kg]) => ({
           name: CATEGORIES[cat]?.label || cat,

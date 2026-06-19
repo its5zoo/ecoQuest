@@ -224,8 +224,8 @@ export default function App() {
               category: a.category,
               duration: a.duration,
               quantity: a.quantity,
-              carbonKg: a.co2Generated,
-              timestamp: a.timestamp
+              carbonKg: a.co2Generated ?? 0,
+              timestamp: a.timestamp || new Date().toISOString()
             }));
             useTrackerStore.setState({ activities: mapped });
           }
