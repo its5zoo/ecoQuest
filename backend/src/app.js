@@ -2,9 +2,7 @@ const express  = require('express');
 const cors     = require('cors');
 const helmet   = require('helmet');
 const morgan   = require('morgan');
-const session  = require('express-session');
 const passport = require('./config/passport');
-const { getSessionSecret } = require('./config/secrets');
 
 // ─── Register all Mongoose models to prevent MissingSchemaError ──────────────
 require('./models/User');
@@ -50,18 +48,6 @@ app.use(express.urlencoded({ limit: '1mb', extended: false }));
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-
-app.use(session({
-  secret: getSessionSecret(),
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-    maxAge: 10 * 60 * 1000,
-  },
-}));
 
 app.use(passport.initialize());
 

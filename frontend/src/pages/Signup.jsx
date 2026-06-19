@@ -33,7 +33,7 @@ function EmailInput({ value, onChange, touched, setTouched, dark = true }) {
 
   return (
     <div>
-      <label style={{
+      <label htmlFor="signup-email" style={{
         fontSize: '0.8rem',
         color: dark ? 'rgba(240,253,244,0.6)' : 'var(--text-muted)',
         display: 'block', marginBottom: '8px', fontWeight: 500,
@@ -59,6 +59,7 @@ function EmailInput({ value, onChange, touched, setTouched, dark = true }) {
 
       <div style={{ position: 'relative' }}>
         <input
+          id="signup-email"
           type="email"
           placeholder="yourname@gmail.com"
           value={value}
@@ -415,8 +416,9 @@ export default function Signup() {
             {/* Name (signup only) */}
             {!isLogin && (
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Full Name *</label>
+                <label htmlFor="signup-name" style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Full Name *</label>
                 <input
+                  id="signup-name"
                   type="text"
                   placeholder="Your Name"
                   value={form.name}
@@ -439,8 +441,9 @@ export default function Signup() {
 
             {/* Password */}
             <div>
-              <label style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Password *</label>
+              <label htmlFor="signup-password" style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Password *</label>
               <input
+                id="signup-password"
                 type="password"
                 placeholder="Min. 8 characters"
                 value={form.password}
@@ -470,8 +473,9 @@ export default function Signup() {
             {/* Confirm Password (signup only) */}
             {!isLogin && (
               <div>
-                <label style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Confirm Password *</label>
+                <label htmlFor="signup-confirm" style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>Confirm Password *</label>
                 <input
+                  id="signup-confirm"
                   type="password"
                   placeholder="Repeat password"
                   value={form.confirm}
@@ -493,8 +497,9 @@ export default function Signup() {
             {!isLogin && (
               <div style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>District / City *</label>
+                  <label htmlFor="signup-district" style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>District / City *</label>
                   <input
+                    id="signup-district"
                     type="text"
                     placeholder="e.g. Mumbai"
                     value={form.district}
@@ -505,8 +510,9 @@ export default function Signup() {
                   />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>State *</label>
+                  <label htmlFor="signup-state" style={{ fontSize: '0.8rem', color: 'rgba(240,253,244,0.6)', display: 'block', marginBottom: '8px', fontWeight: 500 }}>State *</label>
                   <input
+                    id="signup-state"
                     type="text"
                     placeholder="e.g. Maharashtra"
                     value={form.state}

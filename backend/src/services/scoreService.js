@@ -17,6 +17,7 @@ class ScoreService {
 
     // 1. Find or create today's ScoreHistory
     let history = await UserScoreHistory.findOne({ user: userId, date: today });
+    const isFirstActivityToday = !history;
     if (!history) {
       history = new UserScoreHistory({ user: userId, date: today });
     }
@@ -48,18 +49,14 @@ class ScoreService {
       user.level = getLevelFromXP(user.xp);
       
       // Streak Calculation
-      const todayStr = new Date().toDateString();
-      const lastActiveStr = user.lastActive ? new Date(user.lastActive).toDateString() : null;
-
-      if (!user.streak || user.streak === 0) {
-        user.streak = 1;
-        user.lastActive = new Date();
-      } else if (lastActiveStr !== todayStr) {
-        const yesterday = new Date();
+      if (isFirstActivityToday) {
+        const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toDateString();
+        const yesterdayHistory = await UserScoreHistory.findOne({ user: userId, date: yesterday });
 
-        if (lastActiveStr === yesterdayStr) {
+        if (!user.streak || user.streak === 0) {
+          user.streak = 1;
+        } else if (yesterdayHistory) {
           user.streak = user.streak + 1;
         } else {
           user.streak = 1;

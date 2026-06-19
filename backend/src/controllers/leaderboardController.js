@@ -44,7 +44,7 @@ const getLeaderboard = async (req, res) => {
   try {
     const scope  = req.query.scope  || 'global';
     const region = req.query.region || '';
-    const limit  = Math.min(parseInt(req.query.limit)  || 50, 200);
+    const limit  = Math.min(Math.max(parseInt(req.query.limit)  || 50, 1), 200);
     const page   = Math.max(parseInt(req.query.page)   || 1, 1);
     const skip   = (page - 1) * limit;
 
@@ -174,10 +174,8 @@ const getMyRank = async (req, res) => {
     if (!stateRank)    stateRank    = await computeMongoRank(user, 'state');
     if (!districtRank) districtRank = await computeMongoRank(user, 'district');
 
-    // Persist fresh ranks back to the user document
-    await User.findByIdAndUpdate(user._id, {
-      $set: { globalRank, stateRank, districtRank },
-    });
+    // Rank values are returned in the response but not persisted back on a read request.
+    // Persistence is handled by RankingService.updateUserRanking when activities are logged.
 
     const [totalGlobal, totalState, totalDistrict] = await Promise.all([
       User.countDocuments({}),

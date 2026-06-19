@@ -164,16 +164,16 @@ export function calcXP(dailyScore) {
  */
 export function getLevel(totalXP) {
   const levels = [
-    { level: 1,  name: 'Seedling',    minXP: 0,     maxXP: 200    },
-    { level: 2,  name: 'Sprout',      minXP: 200,   maxXP: 500    },
-    { level: 3,  name: 'Sapling',     minXP: 500,   maxXP: 1000   },
-    { level: 4,  name: 'Young Tree',  minXP: 1000,  maxXP: 2000   },
-    { level: 5,  name: 'Green Hero',  minXP: 2000,  maxXP: 3500   },
-    { level: 6,  name: 'Eco Warrior', minXP: 3500,  maxXP: 5500   },
-    { level: 7,  name: 'Earth Guardian', minXP: 5500, maxXP: 8000 },
-    { level: 8,  name: 'Planet Sage', minXP: 8000,  maxXP: 11000  },
-    { level: 9,  name: 'Eco Legend',  minXP: 11000, maxXP: 15000  },
-    { level: 10, name: 'Climate Hero', minXP: 15000, maxXP: 15000 },
+    { level: 1,  name: 'Seedling',    minXP: 0,     maxXP: 500    },
+    { level: 2,  name: 'Sprout',      minXP: 500,   maxXP: 1500   },
+    { level: 3,  name: 'Sapling',     minXP: 1500,  maxXP: 3000   },
+    { level: 4,  name: 'Young Tree',  minXP: 3000,  maxXP: 5000   },
+    { level: 5,  name: 'Green Hero',  minXP: 5000,  maxXP: 8000   },
+    { level: 6,  name: 'Eco Warrior', minXP: 8000,  maxXP: 12000  },
+    { level: 7,  name: 'Earth Guardian', minXP: 12000, maxXP: 18000 },
+    { level: 8,  name: 'Planet Sage', minXP: 18000, maxXP: 25000  },
+    { level: 9,  name: 'Eco Legend',  minXP: 25000, maxXP: 35000  },
+    { level: 10, name: 'Climate Hero', minXP: 35000, maxXP: 35000 },
   ];
 
   for (let i = levels.length - 1; i >= 0; i--) {

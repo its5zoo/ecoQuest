@@ -98,10 +98,11 @@ function LocationRequiredModal() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px', textAlign: 'left' }}>
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
+            <label htmlFor="location-district" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
               DISTRICT / CITY *
             </label>
             <input
+              id="location-district"
               type="text"
               placeholder="e.g. Mumbai"
               value={district}
@@ -125,10 +126,11 @@ function LocationRequiredModal() {
           </div>
 
           <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
+            <label htmlFor="location-state" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
               STATE *
             </label>
             <input
+              id="location-state"
               type="text"
               placeholder="e.g. Maharashtra"
               value={state}

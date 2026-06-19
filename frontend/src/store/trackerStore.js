@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'react-toastify';
 import { calcDailyScore, getLevel, generateSuggestions, CATEGORIES } from '../utils/carbonLogic';
+import useAuthStore from './authStore';
+import apiRequest from '../services/apiClient';
 
 // ── Tiered Badge System ──────────────────────────────────────
 // tier: 1=Seedling 2=Guardian 3=Champion 4=Legend 5=Apex
@@ -167,7 +169,26 @@ const useTrackerStore = create(
           timestamp: new Date().toISOString(),
         };
 
-        const xpEarned = Math.max(10, Math.round((100 - calcDailyScore(activity.carbonKg * 10)) / 5));
+        // Align optimistic local XP calculation with backend daily-difference logic
+        const todayActivities = get().activities.filter(
+          a => new Date(a.timestamp || Date.now()).toDateString() === today
+        );
+        const oldDailyCarbon = todayActivities.reduce((sum, a) => sum + (a.carbonKg || 0), 0);
+        const newDailyCarbon = oldDailyCarbon + (activity.carbonKg || 0);
+
+        const oldScore = Math.max(0, Math.round(100 - oldDailyCarbon));
+        const newScore = Math.max(0, Math.round(100 - newDailyCarbon));
+
+        const getBackendXPEarned = (score) => {
+          if (score >= 100) return 150; 
+          if (score >= 80) return score + 20;
+          if (score >= 50) return score;
+          return Math.max(10, Math.floor(score / 2));
+        };
+
+        const oldXPEarned = todayActivities.length === 0 ? 0 : getBackendXPEarned(oldScore);
+        const newXPEarned = getBackendXPEarned(newScore);
+        const xpEarned = newXPEarned - oldXPEarned;
         const newTotalXP = get().totalXP + xpEarned;
 
         const {
@@ -240,43 +261,39 @@ const useTrackerStore = create(
 
         // Sync activity to backend in background if user is authenticated
         try {
-          import('./authStore').then(({ default: useAuthStore }) => {
-            const token = useAuthStore.getState().getToken();
-            if (token) {
-              import('../services/apiClient').then(({ default: apiRequest }) => {
-                apiRequest('/tracker/add', {
-                  method: 'POST',
-                  token,
-                  body: {
-                    activityType: activity.name,
-                    category: activity.category,
-                    quantity: parseFloat(activity.quantity) || 1,
-                    duration: parseFloat(activity.duration) || 0,
-                  }
-                }).then(backendData => {
-                  if (backendData && backendData.scoreUpdate) {
-                    const currentUser = useAuthStore.getState().user;
-                    if (currentUser) {
-                      useAuthStore.setState({
-                        user: {
-                          ...currentUser,
-                          xp: backendData.scoreUpdate.newTotalXp,
-                          level: backendData.scoreUpdate.newLevel,
-                          streak: backendData.scoreUpdate.newStreak,
-                        }
-                      });
-                    }
-                    set({
-                      totalXP: backendData.scoreUpdate.newTotalXp,
+          const token = useAuthStore.getState().getToken();
+          if (token) {
+            apiRequest('/tracker/add', {
+              method: 'POST',
+              token,
+              body: {
+                activityType: activity.name,
+                category: activity.category,
+                quantity: parseFloat(activity.quantity) || 1,
+                duration: parseFloat(activity.duration) || 0,
+              }
+            }).then(backendData => {
+              if (backendData && backendData.scoreUpdate) {
+                const currentUser = useAuthStore.getState().user;
+                if (currentUser) {
+                  useAuthStore.setState({
+                    user: {
+                      ...currentUser,
+                      xp: backendData.scoreUpdate.newTotalXp,
+                      level: backendData.scoreUpdate.newLevel,
                       streak: backendData.scoreUpdate.newStreak,
-                    });
-                  }
-                }).catch(err => {
-                  console.error('Failed to sync activity to backend:', err);
+                    }
+                  });
+                }
+                set({
+                  totalXP: backendData.scoreUpdate.newTotalXp,
+                  streak: backendData.scoreUpdate.newStreak,
                 });
-              });
-            }
-          });
+              }
+            }).catch(err => {
+              console.error('Failed to sync activity to backend:', err);
+            });
+          }
         } catch (err) {
           console.error('Error during background sync setup:', err);
         }

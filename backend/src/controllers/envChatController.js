@@ -145,28 +145,23 @@ exports.clearHistory = async (req, res) => {
 };
 
 // ─── Background Cleanup Timer ────────────────────────────────
-// Periodically cleans up messages older than 2 days across all user-specific databases.
+// Periodically cleans up messages older than 2 days.
 // Runs every 12 hours.
-setInterval(async () => {
+const cleanupInterval = setInterval(async () => {
   try {
-    const adminDb = mongoose.connection.db.admin();
-    const { databases } = await adminDb.listDatabases();
     const cutoff = getCutoffDate();
-
-    for (const dbInfo of databases) {
-      if (dbInfo.name.startsWith('usr_')) {
-        const userConn = mongoose.connection.useDb(dbInfo.name, { useCache: true });
-        const UserEnvChat = userConn.model('EnvChat', EnvChat.schema);
-        const result = await UserEnvChat.updateMany(
-          {},
-          { $pull: { messages: { createdAt: { $lt: cutoff } } } }
-        );
-        if (result.modifiedCount > 0) {
-          console.log(`🧹 Scheduled Chat Cleanup [${dbInfo.name}]: Cleared expired messages. Modified: ${result.modifiedCount}`);
-        }
-      }
+    const result = await EnvChat.updateMany(
+      {},
+      { $pull: { messages: { createdAt: { $lt: cutoff } } } }
+    );
+    if (result.modifiedCount > 0) {
+      console.log(`🧹 Scheduled Chat Cleanup: Cleared expired messages. Modified: ${result.modifiedCount}`);
     }
   } catch (err) {
     console.error('Scheduled Chat Cleanup Error:', err);
   }
 }, 12 * 60 * 60 * 1000);
+
+if (typeof cleanupInterval.unref === 'function') {
+  cleanupInterval.unref();
+}

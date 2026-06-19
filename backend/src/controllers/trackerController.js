@@ -57,7 +57,7 @@ const addActivity = async (req, res) => {
 const getActivities = async (req, res) => {
   try {
     const page  = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 50, 1), 200);
     const skip  = (page - 1) * limit;
 
     const UserActivity = getModelForUser(req.user._id, 'Activity');

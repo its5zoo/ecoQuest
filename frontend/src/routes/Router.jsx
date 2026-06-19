@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Layout from '../components/layout/Layout';
 import OAuthCallback from '../pages/OAuthCallback';
 import useAuthStore from '../store/authStore';
@@ -20,15 +20,25 @@ const pageVariants = {
 };
 
 function PageWrapper({ children }) {
+  const prefersReduced = useReducedMotion();
+
+  const variants = prefersReduced
+    ? {
+        initial: { opacity: 0 },
+        enter:   { opacity: 1, transition: { duration: 0 } },
+        exit:    { opacity: 0, transition: { duration: 0 } },
+      }
+    : pageVariants;
+
   return (
     <motion.div
-      variants={pageVariants}
+      variants={variants}
       initial="initial"
       animate="enter"
       exit="exit"
       style={{
         transform: 'translate3d(0, 0, 0)',
-        willChange: 'transform, opacity',
+        willChange: prefersReduced ? 'auto' : 'transform, opacity',
         backfaceVisibility: 'hidden',
       }}
     >
