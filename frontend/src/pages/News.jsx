@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Icon from '../components/shared/Icon';
 import AvatarSVG from '../components/shared/AvatarSVG';
@@ -24,6 +24,7 @@ const SUGGESTIONS = [
 
 /* ── Format timestamp ───────────────────────────────────────── */
 const fmtTime = (d) => {
+  if (!d) return '';
   const date = new Date(d);
   return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
 };
@@ -56,7 +57,7 @@ function AiText({ text }) {
         // Section headings (ALL CAPS line)
         if (/^[A-Z][A-Z\s&/,–—:]{4,}$/.test(trimmed)) {
           return (
-            <div key={i} style={{ fontWeight: 800, fontSize: '0.82rem', color: '#065F46', marginTop: '8px', letterSpacing: '0.3px' }}>
+            <div key={i} style={{ fontWeight: 800, fontSize: '0.92rem', color: '#065F46', marginTop: '12px', marginBottom: '6px', letterSpacing: '0.3px' }}>
               {renderFormattedText(trimmed)}
             </div>
           );
@@ -65,7 +66,7 @@ function AiText({ text }) {
         if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) {
           const content = trimmed.replace(/^[•\-*]\s*/, '');
           return (
-            <div key={i} style={{ display: 'flex', gap: '8px', fontSize: '0.88rem', lineHeight: 1.55 }}>
+            <div key={i} style={{ display: 'flex', gap: '8px', fontSize: '0.88rem', lineHeight: 1.55, margin: '3px 0' }}>
               <span style={{ color: '#10B981', fontWeight: 700, flexShrink: 0 }}>•</span>
               <span>{renderFormattedText(content)}</span>
             </div>
@@ -80,7 +81,7 @@ function AiText({ text }) {
           );
         }
         return (
-          <p key={i} style={{ margin: 0, fontSize: '0.88rem', lineHeight: 1.6 }}>
+          <p key={i} style={{ margin: '4px 0', fontSize: '0.88rem', lineHeight: 1.6 }}>
             {renderFormattedText(trimmed)}
           </p>
         );
@@ -179,6 +180,7 @@ export default function News() {
   const [isTyping, setIsTyping]   = useState(false);
   const [loading, setLoading]     = useState(true);
   const [clearing, setClearing]   = useState(false);
+  const [selectedUserMsgId, setSelectedUserMsgId] = useState(null);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
 
@@ -204,6 +206,29 @@ export default function News() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  /* Synchronize selection to the latest user message when list updates */
+  useEffect(() => {
+    const userMsgs = messages.filter(m => m.role === 'user');
+    if (userMsgs.length > 0) {
+      const hasSelected = userMsgs.some(m => m._id === selectedUserMsgId);
+      if (!selectedUserMsgId || !hasSelected) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedUserMsgId(userMsgs[userMsgs.length - 1]._id);
+      }
+    } else {
+      setSelectedUserMsgId(null);
+    }
+  }, [messages, selectedUserMsgId]);
+
+  const userMessages = useMemo(() => messages.filter(m => m.role === 'user'), [messages]);
+
+  const activeAiMsg = useMemo(() => {
+    const selectedUserIndex = selectedUserMsgId ? messages.findIndex(m => m._id === selectedUserMsgId) : -1;
+    return selectedUserIndex !== -1 && selectedUserIndex < messages.length - 1
+      ? messages[selectedUserIndex + 1]
+      : null;
+  }, [messages, selectedUserMsgId]);
+
   const sendMessage = useCallback(async (text) => {
     const q = (text || input).trim();
     if (!q || isTyping) return;
@@ -212,6 +237,7 @@ export default function News() {
     // Optimistically add user message
     const tempUser = { role: 'user', content: q, createdAt: new Date().toISOString(), _id: `tmp-${Date.now()}` };
     setMessages(prev => [...prev, tempUser]);
+    setSelectedUserMsgId(tempUser._id);
     setIsTyping(true);
 
     try {
@@ -227,6 +253,7 @@ export default function News() {
           data.userMessage,
           data.aiMessage,
         ]);
+        setSelectedUserMsgId(data.userMessage._id);
       } else {
         toast.error(data.message || 'Failed to send message. Please try again.');
         setMessages(prev => prev.filter(m => m._id !== tempUser._id));
@@ -247,6 +274,7 @@ export default function News() {
     try {
       await fetch(`${API}/env-chat`, { method: 'DELETE', headers: authHeaders });
       setMessages([]);
+      setSelectedUserMsgId(null);
       toast.success('🌿 Chat history cleared');
     } catch {
       toast.error('Failed to clear history');
@@ -263,222 +291,145 @@ export default function News() {
 
   return (
     <div className="chat-page-container">
+      <div className="chat-split-grid">
+        
+        {/* Left Column: User Panel */}
+        <div className="chat-user-panel">
+          <div className="chat-panel-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', border: '1.5px solid rgba(16,185,129,0.2)' }}>
+                {user?.avatar && parseSvgAvatarId(user.avatar) ? (
+                  <AvatarSVG svgId={parseSvgAvatarId(user.avatar)} />
+                ) : user?.avatar ? (
+                  <img src={user.avatar} alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#10B981', color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem' }}>
+                    {(user?.name || 'U')[0].toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <span className="chat-panel-title">You</span>
+            </div>
+            
+            {messages.length > 0 && (
+              <button onClick={handleClear} disabled={clearing} className="chat-action-btn">
+                <Icon name="trash-2" size={13} /> {clearing ? 'Clearing...' : 'Clear History'}
+              </button>
+            )}
+          </div>
 
-      {/* ── Top Header ──────────────────────────────────────── */}
-      <div className="chat-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <EcoGuideAvatar size={44} />
-          <div>
-            <h1 style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '1.1rem', margin: 0, lineHeight: 1.2 }}>
-              EcoGuide <span style={{ fontSize: '0.65rem', background: 'rgba(110,231,183,0.25)', padding: '2px 8px', borderRadius: '12px', color: '#6EE7B7', fontWeight: 600, letterSpacing: '0.5px', marginLeft: '6px' }}>AI</span>
-            </h1>
-            <p className="chat-header-desc">
-              Your Environmental Knowledge Assistant
+          <div className="chat-user-questions-list">
+            {loading && <div className="chat-placeholder-state"><p>Loading conversation history...</p></div>}
+
+            {isEmpty && !loading && (
+              <div className="chat-welcome-state">
+                <motion.div animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }} style={{ marginBottom: '16px' }}>
+                  <EcoGuideAvatar size={60} />
+                </motion.div>
+                <h3>Ask EcoGuide!</h3>
+                <p>Dedicated environmental AI assistant.</p>
+                <div className="suggestions-vertical">
+                  {SUGGESTIONS.slice(0, 4).map((s, i) => (
+                    <button key={i} onClick={() => sendMessage(s.text)} className="suggestion-item-btn">
+                      <span>{s.icon}</span> <span>{s.text}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {userMessages.map((msg, index) => {
+              const isSelected = msg._id === selectedUserMsgId;
+              return (
+                <div
+                  key={msg._id || index}
+                  onClick={() => setSelectedUserMsgId(msg._id)}
+                  className={`chat-question-item ${isSelected ? 'active-question' : ''}`}
+                >
+                  <p className="chat-question-text">{msg.content}</p>
+                  <div className="chat-question-meta">
+                    <span>{fmtTime(msg.createdAt)}</span>
+                    <Icon name="check-check" size={12} color="#10B981" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="chat-user-input-area">
+            <div className="chat-input-wrapper">
+              <Icon name="leaf" size={18} color="var(--primary)" style={{ marginLeft: '10px', opacity: 0.65 }} />
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKey}
+                placeholder="Ask EcoGuide about climate, pollution..."
+                disabled={isTyping}
+                rows={1}
+                onInput={e => {
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+                }}
+              />
+              <button onClick={() => sendMessage()} disabled={!input.trim() || isTyping} className="chat-send-btn">
+                {isTyping ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><Icon name="loader" size={16} /></motion.div> : <Icon name="send" size={16} />}
+              </button>
+            </div>
+            <p className="chat-input-footnote">
+              EcoGuide only answers environmental topics • Chat saved to your account • Press Enter to send
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {messages.length > 0 && (
-            <motion.button
-              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              onClick={handleClear}
-              disabled={clearing}
-              style={{ padding: '7px 14px', borderRadius: '10px', border: '1.5px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.08)', color: '#A7F3D0', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
-            >
-              <Icon name="trash-2" size={13} /> {clearing ? 'Clearing...' : 'Clear History'}
-            </motion.button>
-          )}
-          <div style={{ padding: '6px 12px', borderRadius: '20px', background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.4)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10B981' }} />
-            <span style={{ color: '#6EE7B7', fontSize: '0.74rem', fontWeight: 700 }}>Online</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Messages Area ────────────────────────────────────── */}
-      <div className="chat-messages-container">
-        <div className="chat-messages-inner">
-
-          {/* Loading skeleton */}
-          {loading && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {[1,2,3].map(i => (
-                <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', justifyContent: i % 2 === 0 ? 'flex-end' : 'flex-start' }}>
-                  {i % 2 !== 0 && <div className="skeleton" style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }} />}
-                  <div className="skeleton" style={{ height: '52px', width: `${40 + i * 15}%`, borderRadius: '14px' }} />
-                </div>
-              ))}
+        {/* Right Column: AI Panel */}
+        <div className="chat-ai-panel">
+          <div className="chat-panel-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <EcoGuideAvatar size={28} />
+              <span className="chat-panel-title">EcoGuide AI</span>
             </div>
-          )}
+            <div className="chat-online-badge">
+              <span className="dot" />
+              <span>Online</span>
+            </div>
+          </div>
 
-          {/* Empty state */}
-          {isEmpty && !loading && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '24px 16px 32px 16px', margin: 'auto 0', width: '100%' }}>
-
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                style={{ marginBottom: '20px' }}>
-                <EcoGuideAvatar size={80} />
-              </motion.div>
-
-              <h2 style={{ fontWeight: 800, fontSize: '1.8rem', color: '#022c22', marginBottom: '8px', letterSpacing: '-0.025em', fontFamily: 'var(--font-heading)' }}>Ask EcoGuide Anything!</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', maxWidth: '480px', lineHeight: 1.6, marginBottom: '28px', fontFamily: 'var(--font-body)' }}>
-                I'm your dedicated environmental AI assistant. Ask me about climate change, carbon footprint, pollution, renewable energy, biodiversity, or any eco topic!
-              </p>
-
-              {/* Suggestion chips */}
-              <div className="suggestions-grid">
-                {SUGGESTIONS.map((s, i) => (
-                  <motion.button key={i}
-                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
-                    whileHover={{ scale: 1.03, y: -1, background: '#ffffff', borderColor: 'rgba(16,185,129,0.4)', boxShadow: '0 6px 16px rgba(6,78,59,0.08)' }} whileTap={{ scale: 0.97 }}
-                    onClick={() => sendMessage(s.text)}
-                    style={{ padding: '12px 16px', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.15)', background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', color: '#022c22', fontSize: '0.84rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(6,78,59,0.03)', transition: 'all 0.25s ease', width: '100%', justifyContent: 'flex-start' }}
-                  >
-                    <span style={{ fontSize: '1.1rem' }}>{s.icon}</span>
-                    <span style={{ textAlign: 'left', lineHeight: 1.25 }}>{s.text}</span>
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Message bubbles */}
-          <AnimatePresence initial={false}>
-            {messages.map((msg, i) => {
-              const isUser = msg.role === 'user';
-              return (
-                <motion.div key={msg._id || i}
-                  initial={{ opacity: 0, y: 12, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
-                  style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', justifyContent: isUser ? 'flex-end' : 'flex-start' }}
-                >
-                  {/* AI avatar on left */}
-                  {!isUser && <EcoGuideAvatar size={34} />}
-
-                  <div className="chat-bubble-wrapper" style={{ alignItems: isUser ? 'flex-end' : 'flex-start' }}>
-                    {/* Sender label */}
-                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', paddingLeft: isUser ? 0 : '4px', paddingRight: isUser ? '4px' : 0 }}>
-                      {isUser ? (user?.name || 'You') : 'EcoGuide'} · {fmtTime(msg.createdAt)}
-                    </span>
-
-                    {/* Bubble */}
-                    <motion.div
-                      initial={{ scale: 0.95 }} animate={{ scale: 1 }}
-                      style={{
-                        padding: '13px 18px',
-                        borderRadius: isUser ? '18px 4px 18px 18px' : '4px 18px 18px 18px',
-                        background: isUser
-                          ? 'linear-gradient(135deg, #10B981, #059669)'
-                          : '#FFFFFF',
-                        color: isUser ? '#FFFFFF' : 'var(--text-primary)',
-                        boxShadow: isUser
-                          ? '0 4px 14px rgba(16,185,129,0.3)'
-                          : '0 4px 20px -2px rgba(6, 78, 59, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02)',
-                        fontSize: '0.88rem',
-                        lineHeight: 1.6,
-                        border: isUser ? 'none' : '1px solid rgba(16,185,129,0.08)',
-                      }}
-                    >
-                      {isUser
-                        ? <p style={{ margin: 0 }}>{msg.content}</p>
-                        : <AiText text={msg.content} />
-                      }
-                    </motion.div>
-                  </div>
-
-                  {/* User avatar on right */}
-                  {isUser && (
-                    <div style={{ width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '2px solid rgba(16,185,129,0.4)', background: '#ECFDF5' }}>
-                      {user?.avatar && parseSvgAvatarId(user.avatar) ? (
-                        <AvatarSVG svgId={parseSvgAvatarId(user.avatar)} />
-                      ) : user?.avatar ? (
-                        <img src={user.avatar} alt={user.name || 'Your avatar'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#10B981', color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem' }}>
-                          {(user?.name || 'U')[0].toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-
-          {/* Typing indicator */}
-          {isTyping && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-              style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <EcoGuideAvatar size={34} />
-              <div style={{ padding: '10px 16px', borderRadius: '4px 18px 18px 18px', background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 10px rgba(0,0,0,0.07)' }}>
+          <div className="chat-ai-answer-area">
+            {isTyping && !activeAiMsg && (
+              <div className="chat-typing-container">
+                <p className="chat-typing-text">EcoGuide is preparing your response...</p>
                 <TypingDots />
               </div>
-            </motion.div>
-          )}
+            )}
 
-          <div ref={bottomRef} />
-        </div>
-      </div>
-
-      {/* ── Input Bar ────────────────────────────────────────── */}
-      <div className="chat-input-bar">
-        <div className="chat-input-inner">
-          <div style={{ flex: 1, position: 'relative' }}>
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Ask EcoGuide about climate, pollution, carbon footprint..."
-              disabled={isTyping}
-              rows={1}
-              style={{
-                width: '100%', padding: '8px 14px', borderRadius: '10px',
-                border: '1.5px solid rgba(0,0,0,0.1)', fontSize: '0.92rem',
-                outline: 'none', resize: 'none', overflowY: 'auto',
-                fontFamily: 'inherit', lineHeight: 1.5, color: 'var(--text-primary)',
-                background: isAuthenticated ? '#FFFFFF' : '#F8FAFC',
-                boxSizing: 'border-box',
-                maxHeight: '120px',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-              }}
-              onFocus={e => { e.target.style.borderColor = '#10B981'; e.target.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.12)'; }}
-              onBlur={e => { e.target.style.borderColor = 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }}
-              onInput={e => {
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-              }}
-            />
+            {activeAiMsg ? (
+              <div className="chat-ai-content">
+                <AiText text={activeAiMsg.content} />
+              </div>
+            ) : !isTyping ? (
+              <div className="chat-placeholder-state">
+                <Icon name="message-square" size={48} color="var(--primary)" style={{ opacity: 0.25, marginBottom: '16px' }} />
+                <p>Select a question on the left or type a new one to view responses.</p>
+              </div>
+            ) : null}
+            <div ref={bottomRef} />
           </div>
 
-          <motion.button
-            whileHover={{ scale: input.trim() ? 1.07 : 1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => sendMessage()}
-            disabled={!input.trim() || isTyping}
-            aria-label="Send message"
-            style={{
-              width: '40px', height: '40px', borderRadius: '10px', border: 'none', cursor: input.trim() ? 'pointer' : 'not-allowed',
-              background: input.trim() ? 'linear-gradient(135deg, #10B981, #059669)' : '#E2E8F0',
-              color: input.trim() ? '#FFFFFF' : '#94A3B8',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0, transition: 'background 0.2s',
-              boxShadow: input.trim() ? '0 4px 12px rgba(16,185,129,0.35)' : 'none',
-            }}
-          >
-            {isTyping
-              ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}><Icon name="loader" size={18} /></motion.div>
-              : <Icon name="send" size={18} />
-            }
-          </motion.button>
+          {activeAiMsg && (
+            <div className="chat-ai-actions">
+              <button onClick={() => {
+                navigator.clipboard.writeText(activeAiMsg.content);
+                toast.success('📋 Copied to clipboard!');
+              }} className="chat-icon-btn" title="Copy response">
+                <Icon name="copy" size={15} />
+              </button>
+              <button className="chat-icon-btn" title="Thumbs Up"><Icon name="thumbs-up" size={15} /></button>
+              <button className="chat-icon-btn" title="Thumbs Down"><Icon name="thumbs-down" size={15} /></button>
+            </div>
+          )}
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-          EcoGuide only answers environmental topics • Chat saved to your account • Press Enter to send
-        </p>
       </div>
     </div>
   );

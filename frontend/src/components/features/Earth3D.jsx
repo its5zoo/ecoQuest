@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
+/* eslint-disable react-hooks/refs */
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
@@ -107,6 +108,10 @@ export default function Earth3D({ animPhase = 0, earthContainerRef }) {
   const [retryKey, setRetryKey] = useState(0);
   const [eventElement, setEventElement] = useState(null);
 
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const isHorizontalDragRef = useRef(false);
+  const listenerMapRef = useRef(new WeakMap());
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -151,18 +156,117 @@ export default function Earth3D({ animPhase = 0, earthContainerRef }) {
   }, [ready, earthContainerRef]);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const el = eventElement;
+    if (!el) return;
 
-    const handleWheel = (e) => {
-      e.stopPropagation();
+    const handleDown = (e) => {
+      const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+      const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+      touchStartRef.current = { x: clientX, y: clientY };
+      isHorizontalDragRef.current = false;
     };
 
-    container.addEventListener('wheel', handleWheel, { passive: true });
+    const handleMove = (e) => {
+      const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+      const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+      const dx = Math.abs(clientX - touchStartRef.current.x);
+      const dy = Math.abs(clientY - touchStartRef.current.y);
+      if (dx > dy && dx > 8) {
+        isHorizontalDragRef.current = true;
+      }
+    };
+
+    el.addEventListener('touchstart', handleDown, { passive: true });
+    el.addEventListener('touchmove', handleMove, { passive: true });
+    el.addEventListener('pointerdown', handleDown, { passive: true });
+    el.addEventListener('pointermove', handleMove, { passive: true });
+
     return () => {
-      container.removeEventListener('wheel', handleWheel);
+      el.removeEventListener('touchstart', handleDown);
+      el.removeEventListener('touchmove', handleMove);
+      el.removeEventListener('pointerdown', handleDown);
+      el.removeEventListener('pointermove', handleMove);
+    };
+  }, [eventElement]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const preventDefaultOverride = (e) => {
+      e.preventDefault = () => {};
+    };
+
+    el.addEventListener('wheel', preventDefaultOverride, { capture: true, passive: true });
+
+    return () => {
+      el.removeEventListener('wheel', preventDefaultOverride, { capture: true });
     };
   }, [ready]);
+
+  const customDomElement = useMemo(() => {
+    if (!eventElement) return null;
+    return {
+      addEventListener(type, listener, options) {
+        if (type === 'wheel') return;
+
+        if (type === 'pointermove' || type === 'touchmove') {
+          const wrappedListener = (e) => {
+            const originalPreventDefault = e.preventDefault;
+            e.preventDefault = function() {
+              if (isHorizontalDragRef.current) {
+                originalPreventDefault.call(e);
+              }
+            };
+            listener(e);
+          };
+          listenerMapRef.current.set(listener, wrappedListener);
+          eventElement.addEventListener(type, wrappedListener, options);
+          return;
+        }
+
+        eventElement.addEventListener(type, listener, options);
+      },
+      removeEventListener(type, listener, options) {
+        if (type === 'wheel') return;
+
+        if (type === 'pointermove' || type === 'touchmove') {
+          const wrapped = listenerMapRef.current.get(listener);
+          if (wrapped) {
+            eventElement.removeEventListener(type, wrapped, options);
+            listenerMapRef.current.delete(listener);
+            return;
+          }
+        }
+
+        eventElement.removeEventListener(type, listener, options);
+      },
+      get clientWidth() { return eventElement.clientWidth; },
+      get clientHeight() { return eventElement.clientHeight; },
+      getBoundingClientRect() { return eventElement.getBoundingClientRect(); },
+      get ownerDocument() { return eventElement.ownerDocument; },
+      get style() {
+        return new Proxy(eventElement.style, {
+          get(target, prop) {
+            if (prop === 'touchAction') return 'pan-y';
+            const val = target[prop];
+            return typeof val === 'function' ? val.bind(target) : val;
+          },
+          set(target, prop, value) {
+            if (prop === 'touchAction') {
+              target[prop] = 'pan-y';
+              return true;
+            }
+            target[prop] = value;
+            return true;
+          }
+        });
+      },
+      get tabIndex() { return eventElement.tabIndex; },
+      set tabIndex(val) { eventElement.tabIndex = val; },
+      focus(options) { eventElement.focus?.(options); }
+    };
+  }, [eventElement]);
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%', cursor: 'grab', position: 'relative', background: 'transparent', touchAction: 'pan-y' }}>
@@ -171,7 +275,7 @@ export default function Earth3D({ animPhase = 0, earthContainerRef }) {
           <React.Suspense fallback={null}>
             <RealisticEarth animPhase={animPhase} />
           </React.Suspense>
-          <OrbitControls key={eventElement ? 'custom-controls' : 'default-controls'} domElement={eventElement || undefined} enableZoom={false} enablePan={false} autoRotate={false} target={[0, 0, 0]} />
+          <OrbitControls key={customDomElement ? 'custom-controls' : 'default-controls'} domElement={customDomElement || undefined} enableZoom={false} enablePan={false} autoRotate={false} target={[0, 0, 0]} />
         </Canvas>
       )}
     </div>
