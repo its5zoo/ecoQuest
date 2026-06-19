@@ -604,10 +604,10 @@ export default function Home() {
                 </div>
                 <h3 className="text-card-title" style={{ marginBottom: '10px' }}>{c.title}</h3>
                 <p className="text-body" style={{ color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '8px' }}>{c.desc}</p>
-                <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', color: c.color, fontWeight: 700 }}>
+                {/* <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', color: c.color, fontWeight: 700 }}>
                   <span>Read detailed guide</span>
                   <Icon name="arrow-right" size={12} />
-                </div>
+                </div> */}
               </motion.div>
             ))}
           </div>
