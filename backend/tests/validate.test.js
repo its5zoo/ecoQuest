@@ -2,8 +2,10 @@ const {
   validateSignup,
   validateLogin,
   validateActivity,
+  validatePostContent,
   sanitizeProfileUpdates,
   EMAIL_RE,
+  MAX_POST_LENGTH,
 } = require('../src/utils/validate');
 
 describe('validateSignup', () => {
@@ -126,6 +128,55 @@ describe('validateActivity', () => {
       quantity: 2,
     });
     expect(result.valid).toBe(true);
+  });
+});
+
+describe('validatePostContent', () => {
+  it('requires content and scope', () => {
+    const result = validatePostContent({});
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining(['Content is required', 'Scope is required'])
+    );
+  });
+
+  it('rejects invalid scope values', () => {
+    const result = validatePostContent({ content: 'Hello', scope: 'District' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Invalid scope value');
+  });
+
+  it('rejects posts that exceed the max length', () => {
+    const result = validatePostContent({
+      content: 'x'.repeat(MAX_POST_LENGTH + 1),
+      scope: 'State',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]).toMatch(/2000 characters or fewer/);
+  });
+
+  it('handles null content safely', () => {
+    const result = validatePostContent({ content: null, scope: 'State' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Content is required');
+  });
+
+  it('handles a null request body safely', () => {
+    const result = validatePostContent(null);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Content is required');
+  });
+
+  it('accepts numeric content values', () => {
+    const result = validatePostContent({ content: 12345, scope: 'State' });
+    expect(result.valid).toBe(true);
+    expect(result.content).toBe('12345');
+  });
+
+  it('accepts valid post payloads and trims content', () => {
+    const result = validatePostContent({ content: '  Green tip  ', scope: 'Country' });
+    expect(result.valid).toBe(true);
+    expect(result.content).toBe('Green tip');
   });
 });
 

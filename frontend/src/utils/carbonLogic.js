@@ -78,13 +78,26 @@ export function calcActivityCarbon(factorKey, quantity) {
 }
 
 /**
- * Calculate daily carbon score (0-100, higher = worse)
- * Average human daily footprint ~15kg CO2
+ * Canonical level thresholds — shared with backend getLevelFromXP.
+ */
+export const LEVELS = [
+  { level: 1,  name: 'Seedling',       minXP: 0,     maxXP: 500,    emoji: '🌱' },
+  { level: 2,  name: 'Sprout',         minXP: 500,   maxXP: 1500,   emoji: '🌿' },
+  { level: 3,  name: 'Sapling',        minXP: 1500,  maxXP: 3000,   emoji: '🌳' },
+  { level: 4,  name: 'Young Tree',     minXP: 3000,  maxXP: 5000,   emoji: '🌲' },
+  { level: 5,  name: 'Green Hero',     minXP: 5000,  maxXP: 8000,   emoji: '⚡' },
+  { level: 6,  name: 'Eco Warrior',    minXP: 8000,  maxXP: 12000,  emoji: '🛡️' },
+  { level: 7,  name: 'Earth Guardian', minXP: 12000, maxXP: 18000,  emoji: '🌍' },
+  { level: 8,  name: 'Planet Sage',    minXP: 18000, maxXP: 25000,  emoji: '🔮' },
+  { level: 9,  name: 'Eco Legend',     minXP: 25000, maxXP: 35000,  emoji: '👑' },
+  { level: 10, name: 'Climate Hero',   minXP: 35000, maxXP: 35000,  emoji: '🏆' },
+];
+
+/**
+ * Daily carbon score (0-100, higher = better). Matches backend calculateDailyScore.
  */
 export function calcDailyScore(totalKg) {
-  const maxDaily = 30; // 30kg = extremely high
-  const score = Math.min(100, Math.round((totalKg / maxDaily) * 100));
-  return score;
+  return Math.max(0, Math.round(100 - totalKg));
 }
 
 /**
@@ -153,33 +166,23 @@ export function generateSuggestions(activities) {
 }
 
 /**
- * Calculate XP from carbon score (lower score = more XP)
+ * XP earned for a daily score. Matches backend calculateXPEarned.
  */
 export function calcXP(dailyScore) {
-  return Math.max(0, Math.round((100 - dailyScore) * 2));
+  if (dailyScore >= 100) return 150;
+  if (dailyScore >= 80) return dailyScore + 20;
+  if (dailyScore >= 50) return dailyScore;
+  return Math.max(10, Math.floor(dailyScore / 2));
 }
 
 /**
  * Get level from total XP
  */
 export function getLevel(totalXP) {
-  const levels = [
-    { level: 1,  name: 'Seedling',    minXP: 0,     maxXP: 500    },
-    { level: 2,  name: 'Sprout',      minXP: 500,   maxXP: 1500   },
-    { level: 3,  name: 'Sapling',     minXP: 1500,  maxXP: 3000   },
-    { level: 4,  name: 'Young Tree',  minXP: 3000,  maxXP: 5000   },
-    { level: 5,  name: 'Green Hero',  minXP: 5000,  maxXP: 8000   },
-    { level: 6,  name: 'Eco Warrior', minXP: 8000,  maxXP: 12000  },
-    { level: 7,  name: 'Earth Guardian', minXP: 12000, maxXP: 18000 },
-    { level: 8,  name: 'Planet Sage', minXP: 18000, maxXP: 25000  },
-    { level: 9,  name: 'Eco Legend',  minXP: 25000, maxXP: 35000  },
-    { level: 10, name: 'Climate Hero', minXP: 35000, maxXP: 35000 },
-  ];
-
-  for (let i = levels.length - 1; i >= 0; i--) {
-    if (totalXP >= levels[i].minXP) return levels[i];
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (totalXP >= LEVELS[i].minXP) return LEVELS[i];
   }
-  return levels[0];
+  return LEVELS[0];
 }
 
 /**

@@ -9,8 +9,8 @@ import { toast } from 'react-toastify';
 import useAuthStore from '../store/authStore';
 import useTrackerStore from '../store/trackerStore';
 import { formatCarbon, formatDate } from '../utils/helpers';
-import { getLevel } from '../utils/carbonLogic';
-import useSocialStore from '../store/socialStore';
+import { getLevel, LEVELS } from '../utils/carbonLogic';
+import { keyboardActivate } from '../utils/a11y';
 import Icon from '../components/shared/Icon';
 import VirtualForest from '../components/features/VirtualForest';
 import ShareCard from '../components/features/ShareCard';
@@ -164,30 +164,17 @@ function BadgeCard({ badge }) {
 
 /* ── Level Journey Map ──────────────────────────────────────── */
 function LevelJourney({ currentLevel }) {
-  const levels = [
-    { level: 1,  name: 'Seedling',    minXP: 0,     emoji: '🌱' },
-    { level: 2,  name: 'Sprout',      minXP: 200,   emoji: '🌿' },
-    { level: 3,  name: 'Sapling',     minXP: 500,   emoji: '🌳' },
-    { level: 4,  name: 'Young Tree',  minXP: 1000,  emoji: '🌲' },
-    { level: 5,  name: 'Green Hero',  minXP: 2000,  emoji: '⚡' },
-    { level: 6,  name: 'Eco Warrior', minXP: 3500,  emoji: '🛡️' },
-    { level: 7,  name: 'Earth Guard', minXP: 5500,  emoji: '🌍' },
-    { level: 8,  name: 'Planet Sage', minXP: 8000,  emoji: '🔮' },
-    { level: 9,  name: 'Eco Legend',  minXP: 11000, emoji: '👑' },
-    { level: 10, name: 'Climate Hero',minXP: 15000, emoji: '🏆' },
-  ];
-
   return (
-    <div style={{ overflowX: 'auto', paddingBottom: '8px' }}>
+    <div style={{ overflowX: 'auto', paddingBottom: '8px' }} role="list" aria-label="Level progression">
       <div style={{ display: 'flex', alignItems: 'center', gap: '0', minWidth: '600px' }}>
-        {levels.map((lvl, i) => {
+        {LEVELS.map((lvl, i) => {
           const isCompleted = lvl.level < currentLevel;
           const isCurrent   = lvl.level === currentLevel;
           const isLocked    = lvl.level > currentLevel;
           const tier = getTierByXP(lvl.minXP);
 
           return (
-            <div key={lvl.level} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <div key={lvl.level} role="listitem" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', minWidth: '52px' }}>
                 <motion.div
                   whileHover={{ scale: 1.15 }}
@@ -204,6 +191,7 @@ function LevelJourney({ currentLevel }) {
                     cursor: 'default',
                   }}
                   title={`Level ${lvl.level}: ${lvl.name} (${lvl.minXP} XP)`}
+                  aria-label={`Level ${lvl.level}: ${lvl.name}${isCurrent ? ' (current)' : isLocked ? ' (locked)' : ' (completed)'}`}
                 >
                   {isLocked ? <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>L{lvl.level}</span> : lvl.emoji}
                 </motion.div>
@@ -211,8 +199,8 @@ function LevelJourney({ currentLevel }) {
                   {lvl.name}
                 </span>
               </div>
-              {i < levels.length - 1 && (
-                <div style={{ flex: 1, height: '3px', background: isCompleted ? tier.color : '#E2E8F0', borderRadius: '2px', transition: 'background 0.3s', minWidth: '8px' }} />
+              {i < LEVELS.length - 1 && (
+                <div style={{ flex: 1, height: '3px', background: isCompleted ? tier.color : '#E2E8F0', borderRadius: '2px', transition: 'background 0.3s', minWidth: '8px' }} aria-hidden="true" />
               )}
             </div>
           );
@@ -227,7 +215,6 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, isAuthenticated, updateUser, token } = useAuthStore();
   const store = useTrackerStore();
-  const socialStore = useSocialStore();
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', bio: '', district: '', state: '', country: '' });
@@ -312,21 +299,10 @@ export default function Profile() {
   const allActivities = store.activities || [];
   const totalCarbon  = allActivities.reduce((s, a) => s + (a.carbonKg || 0), 0);
 
-  const districtBoard  = typeof socialStore.getLeaderboard === 'function'
-    ? socialStore.getLeaderboard('District', currentXP, user.name, user.avatar, user.district)
-    : [];
-  const stateBoard     = typeof socialStore.getLeaderboard === 'function'
-    ? socialStore.getLeaderboard('State',    currentXP, user.name, user.avatar, user.district)
-    : [];
-  const nationalBoard  = typeof socialStore.getLeaderboard === 'function'
-    ? socialStore.getLeaderboard('Country',  currentXP, user.name, user.avatar, user.district)
-    : [];
-
-  const getMyRank = (board) => (board || []).find(u => u.id === 'me')?.rank ?? '-';
   const dynamicRanks = [
-    { scope: 'District',  rank: myRanks?.district?.rank ?? getMyRank(districtBoard),  total: myRanks?.district?.total ?? 50,  icon: 'home',  color: '#06B6D4', emoji: '🏘️' },
-    { scope: 'State',     rank: myRanks?.state?.rank ?? getMyRank(stateBoard),        total: myRanks?.state?.total ?? 500,    icon: 'map',   color: '#8B5CF6', emoji: '🗺️' },
-    { scope: 'National',  rank: myRanks?.global?.rank ?? getMyRank(nationalBoard),     total: myRanks?.global?.total ?? 5000,  icon: 'flag',  color: '#F59E0B', emoji: '🇮🇳' },
+    { scope: 'District',  rank: myRanks?.district?.rank ?? '—',  total: myRanks?.district?.total ?? 0,  icon: 'home',  color: '#06B6D4', emoji: '🏘️' },
+    { scope: 'State',     rank: myRanks?.state?.rank ?? '—',        total: myRanks?.state?.total ?? 0,    icon: 'map',   color: '#8B5CF6', emoji: '🗺️' },
+    { scope: 'National',  rank: myRanks?.global?.rank ?? '—',     total: myRanks?.global?.total ?? 0,  icon: 'flag',  color: '#F59E0B', emoji: '🇮🇳' },
   ];
 
   // Group badges by tier
@@ -410,7 +386,14 @@ export default function Profile() {
             {/* Left — Avatar + Info */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
               {/* Avatar with tier glow ring */}
-              <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setShowAvatarPicker(true)}>
+              <div
+                style={{ position: 'relative', cursor: 'pointer' }}
+                role="button"
+                tabIndex={0}
+                aria-label="Change avatar"
+                onClick={() => setShowAvatarPicker(true)}
+                onKeyDown={keyboardActivate(() => setShowAvatarPicker(true))}
+              >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   style={{
@@ -570,7 +553,7 @@ export default function Profile() {
             <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Icon name="map" size={18} color={userTier.color} /> Your Eco Journey — Level {level.level} of 10
             </h3>
-            <LevelJourney currentLevel={level.level} totalXP={store.totalXP || 0} />
+            <LevelJourney currentLevel={level.level} />
           </motion.div>
 
           {/* ── Virtual Forest ─────────────────────────────── */}
@@ -603,7 +586,10 @@ export default function Profile() {
             <h3 className="text-card-title" style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Icon name="trending-up" size={18} color="var(--primary)" /> Weekly Carbon Trend
             </h3>
-            <ResponsiveContainer width="100%" height={220}>
+            <p className="sr-only" id="weekly-carbon-summary">
+              Area chart showing daily carbon emissions in kilograms for the last seven days.
+            </p>
+            <ResponsiveContainer width="100%" height={220} aria-labelledby="weekly-carbon-summary">
               <AreaChart data={weeklyData}>
                 <defs>
                   <linearGradient id="carbonGrad" x1="0" y1="0" x2="0" y2="1">

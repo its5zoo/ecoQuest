@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,8 +10,22 @@ const CountUp = CountUpModule.default || CountUpModule;
 
 import Icon from '../components/shared/Icon';
 import LiveScoreEngine from '../components/features/LiveScoreEngine';
-import Earth3D from '../components/features/Earth3D';
-import HeroAnimationOverlay from '../components/features/HeroAnimationOverlay';
+
+const Earth3D = lazy(() => import('../components/features/Earth3D'));
+const HeroAnimationOverlay = lazy(() => import('../components/features/HeroAnimationOverlay'));
+
+function EarthSceneFallback() {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label="Loading 3D earth animation"
+      style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
+    >
+      Loading…
+    </div>
+  );
+}
 
 /* ─── Data ─────────────────────────────────── */
 const CARBON_CONCEPTS = [
@@ -536,13 +550,15 @@ export default function Home() {
                   touchAction: 'pan-y'
                 }}
               >
-                <Earth3D animPhase={animPhase} earthContainerRef={earthContainerRef} />
-                <HeroAnimationOverlay
-                  key="hero-overlay-v3"
-                  phase={animPhase}
-                  earthContainerRef={earthContainerRef}
-                  humanContainerRef={humanContainerRef}
-                />
+                <Suspense fallback={<EarthSceneFallback />}>
+                  <Earth3D animPhase={animPhase} earthContainerRef={earthContainerRef} />
+                  <HeroAnimationOverlay
+                    key="hero-overlay-v3"
+                    phase={animPhase}
+                    earthContainerRef={earthContainerRef}
+                    humanContainerRef={humanContainerRef}
+                  />
+                </Suspense>
               </div>
             </motion.div>
           </div>

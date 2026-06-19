@@ -32,14 +32,24 @@ if (process.env.NODE_ENV === 'production') {
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
+function getAllowedOrigins() {
+  const origins = [];
+  if (process.env.FRONTEND_URL) origins.push(process.env.FRONTEND_URL.trim());
+  if (process.env.CORS_ORIGINS) {
+    origins.push(
+      ...process.env.CORS_ORIGINS.split(',')
+        .map((o) => o.trim())
+        .filter(Boolean)
+    );
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    origins.push('http://localhost:5173');
+  }
+  return [...new Set(origins)];
+}
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL,
-    'https://ecoquesteits5zoo.up.railway.app',
-    'https://ecoquest5zoo.netlify.app',
-    'https://meticulous-amazement-production-dad1.up.railway.app',
-    'http://localhost:5173'
-  ].filter(Boolean),
+  origin: getAllowedOrigins(),
   credentials: true,
 }));
 app.use(express.json({ limit: '1mb' }));

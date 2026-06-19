@@ -39,4 +39,24 @@ describe('useAuthStore session helpers', () => {
       isAuthenticated: false,
     });
   });
+
+  it('clears expired JWT sessions during validation', () => {
+    const expiredPayload = btoa(JSON.stringify({ exp: 1 }));
+    const expiredToken = `header.${expiredPayload}.signature`;
+
+    useAuthStore.setState({
+      user: { id: '1', name: 'Guest' },
+      token: expiredToken,
+      isAuthenticated: true,
+    });
+
+    useAuthStore.getState().validateSession();
+
+    expect(useAuthStore.getState()).toMatchObject({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+    });
+    expect(useAuthStore.getState().getToken()).toBeNull();
+  });
 });

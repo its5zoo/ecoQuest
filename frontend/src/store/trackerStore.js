@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from 'react-toastify';
-import { calcDailyScore, getLevel, generateSuggestions, CATEGORIES } from '../utils/carbonLogic';
+import { calcDailyScore, calcXP, getLevel, generateSuggestions, CATEGORIES } from '../utils/carbonLogic';
 import useAuthStore from './authStore';
 import apiRequest from '../services/apiClient';
 
@@ -33,7 +33,7 @@ const BADGES = [
   { id: 'eco_warrior',   tier: 3, name: 'Eco Warrior',      icon: 'shield',          tierColor: '#8B5CF6', tierName: 'Champion',
     desc: 'Earn 1500 total XP',                  hint: 'Reach 1500 XP',              xpRequired: 1500, actRequired: 0,   streakRequired: 0,  unlocked: false },
   { id: 'solar_hero',    tier: 3, name: 'Solar Hero',       icon: 'sun',             tierColor: '#8B5CF6', tierName: 'Champion',
-    desc: 'Reach Level 5 — Green Hero',          hint: 'Reach Level 5',              xpRequired: 2000, actRequired: 0,   streakRequired: 0,  unlocked: false },
+    desc: 'Reach Level 5 — Green Hero',          hint: 'Reach Level 5',              xpRequired: 5000, levelRequired: 5, actRequired: 0,   streakRequired: 0,  unlocked: false },
   { id: 'forest_keeper', tier: 3, name: 'Forest Keeper',    icon: 'trees',           tierColor: '#8B5CF6', tierName: 'Champion',
     desc: 'Plant 5 trees in your Virtual Forest',hint: 'Accumulate 5 planted trees',  xpRequired: 2200, actRequired: 0,   streakRequired: 0,  unlocked: false },
   { id: 'month_streak',  tier: 3, name: 'Monthly Guardian', icon: 'calendar-check',  tierColor: '#8B5CF6', tierName: 'Champion',
@@ -41,15 +41,15 @@ const BADGES = [
 
   // ── TIER 4 — Legend (3000–4999 XP) ───────────────────────
   { id: 'earth_guardian',tier: 4, name: 'Earth Guardian',   icon: 'globe',           tierColor: '#F59E0B', tierName: 'Legend',
-    desc: 'Reach Level 7 — Earth Guardian',      hint: 'Reach Level 7',              xpRequired: 3000, actRequired: 0,   streakRequired: 0,  unlocked: false },
+    desc: 'Reach Level 7 — Earth Guardian',      hint: 'Reach Level 7',              xpRequired: 12000, levelRequired: 7, actRequired: 0,   streakRequired: 0,  unlocked: false },
   { id: 'legend_100',    tier: 4, name: 'Century Eco',      icon: 'award',           tierColor: '#F59E0B', tierName: 'Legend',
     desc: 'Log 100 activities total',            hint: 'Log 100 activities in total', xpRequired: 3500, actRequired: 100, streakRequired: 0,  unlocked: false },
 
   // ── TIER 5 — Apex (5000+ XP) ─────────────────────────────
   { id: 'planet_sage',   tier: 5, name: 'Planet Sage',      icon: 'zap',             tierColor: '#EF4444', tierName: 'Apex',
-    desc: 'Reach Level 9 — Eco Legend',          hint: 'Reach Level 9',              xpRequired: 5000, actRequired: 0,   streakRequired: 0,  unlocked: false },
+    desc: 'Reach Level 9 — Eco Legend',          hint: 'Reach Level 9',              xpRequired: 25000, levelRequired: 9, actRequired: 0,   streakRequired: 0,  unlocked: false },
   { id: 'climate_hero',  tier: 5, name: 'Climate Hero',     icon: 'star',            tierColor: '#EF4444', tierName: 'Apex',
-    desc: 'Reach Level 10 — the ultimate rank!', hint: 'Reach Level 10 (Max)',       xpRequired: 15000,actRequired: 0,   streakRequired: 0,  unlocked: false },
+    desc: 'Reach Level 10 — the ultimate rank!', hint: 'Reach Level 10 (Max)',       xpRequired: 35000, levelRequired: 10, actRequired: 0,   streakRequired: 0,  unlocked: false },
 ];
 
 // Full pool of possible daily quests
@@ -176,18 +176,11 @@ const useTrackerStore = create(
         const oldDailyCarbon = todayActivities.reduce((sum, a) => sum + (a.carbonKg || 0), 0);
         const newDailyCarbon = oldDailyCarbon + (activity.carbonKg || 0);
 
-        const oldScore = Math.max(0, Math.round(100 - oldDailyCarbon));
-        const newScore = Math.max(0, Math.round(100 - newDailyCarbon));
+        const oldScore = calcDailyScore(oldDailyCarbon);
+        const newScore = calcDailyScore(newDailyCarbon);
 
-        const getBackendXPEarned = (score) => {
-          if (score >= 100) return 150; 
-          if (score >= 80) return score + 20;
-          if (score >= 50) return score;
-          return Math.max(10, Math.floor(score / 2));
-        };
-
-        const oldXPEarned = todayActivities.length === 0 ? 0 : getBackendXPEarned(oldScore);
-        const newXPEarned = getBackendXPEarned(newScore);
+        const oldXPEarned = todayActivities.length === 0 ? 0 : calcXP(oldScore);
+        const newXPEarned = calcXP(newScore);
         const xpEarned = newXPEarned - oldXPEarned;
         const newTotalXP = get().totalXP + xpEarned;
 
@@ -204,7 +197,8 @@ const useTrackerStore = create(
           const xpOk = newTotalXP >= b.xpRequired;
           const streakOk = b.streakRequired === 0 || newStreak >= b.streakRequired;
           const actOk = b.actRequired === 0 || newActCount >= b.actRequired;
-          return { ...b, unlocked: xpOk && streakOk && actOk };
+          const levelOk = !b.levelRequired || getLevel(newTotalXP).level >= b.levelRequired;
+          return { ...b, unlocked: xpOk && streakOk && actOk && levelOk };
         });
 
         // First activity badge — force unlock on very first log

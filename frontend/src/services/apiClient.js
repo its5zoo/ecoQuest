@@ -1,6 +1,16 @@
-const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e.up.railway.app/api';
-const cleanApi = rawApi.replace(/\/+$/, '');
-const API_BASE = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
+function resolveApiBase() {
+  const rawApi = import.meta.env.VITE_API_URL;
+  if (rawApi) {
+    const cleanApi = rawApi.replace(/\/+$/, '');
+    return cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
+  }
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000/api';
+  }
+  return '/api';
+}
+
+const API_BASE = resolveApiBase();
 
 /** Normalized API root including `/api` suffix. */
 export function getApiBase() {

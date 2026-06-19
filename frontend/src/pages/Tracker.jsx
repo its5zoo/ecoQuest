@@ -265,8 +265,9 @@ function ActivityForm({ onAdd }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
         <div className="form-grid-2">
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Activity Name *</label>
+            <label htmlFor="tracker-activity-name" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Activity Name *</label>
             <input
+              id="tracker-activity-name"
               className="input-field"
               placeholder="e.g., Drove to work"
               value={form.name}
@@ -274,8 +275,9 @@ function ActivityForm({ onAdd }) {
             />
           </div>
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Category</label>
+            <label htmlFor="tracker-activity-category" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Category</label>
             <select
+              id="tracker-activity-category"
               className="input-field"
               value={form.category}
               onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
@@ -289,8 +291,9 @@ function ActivityForm({ onAdd }) {
 
         <div className="form-grid-3">
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Quantity</label>
+            <label htmlFor="tracker-activity-quantity" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Quantity</label>
             <input
+              id="tracker-activity-quantity"
               type="number"
               min="0"
               step="0.1"
@@ -300,16 +303,17 @@ function ActivityForm({ onAdd }) {
             />
           </div>
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Unit</label>
-            <select className="input-field" value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}>
+            <label htmlFor="tracker-activity-unit" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>Unit</label>
+            <select id="tracker-activity-unit" className="input-field" value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}>
               {['km', 'hours', 'kWh', 'litres', 'meals', 'items', 'kg', 'mins'].map(u => (
                 <option key={u} value={u}>{u}</option>
               ))}
             </select>
           </div>
           <div>
-            <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>CO₂ (kg)</label>
+            <label htmlFor="tracker-activity-carbon" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 500 }}>CO₂ (kg)</label>
             <input
+              id="tracker-activity-carbon"
               type="number"
               min="0"
               step="0.001"

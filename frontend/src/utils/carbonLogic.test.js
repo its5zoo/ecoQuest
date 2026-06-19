@@ -9,6 +9,7 @@ import {
   calculateFootprint,
   QUICK_ACTIVITIES,
   CATEGORIES,
+  LEVELS,
 } from './carbonLogic';
 
 describe('carbonLogic exports', () => {
@@ -29,11 +30,11 @@ describe('calcActivityCarbon', () => {
 });
 
 describe('calcDailyScore', () => {
-  it('computes daily score from carbon footprint', () => {
-    expect(calcDailyScore(0)).toBe(0);
-    expect(calcDailyScore(15)).toBe(50);
-    expect(calcDailyScore(30)).toBe(100);
-    expect(calcDailyScore(60)).toBe(100);
+  it('computes daily score from carbon footprint (matches backend)', () => {
+    expect(calcDailyScore(0)).toBe(100);
+    expect(calcDailyScore(15)).toBe(85);
+    expect(calcDailyScore(100)).toBe(0);
+    expect(calcDailyScore(150)).toBe(0);
   });
 });
 
@@ -91,10 +92,12 @@ describe('generateSuggestions', () => {
 });
 
 describe('calcXP', () => {
-  it('awards more XP for lower daily scores', () => {
-    expect(calcXP(0)).toBe(200);
-    expect(calcXP(50)).toBe(100);
-    expect(calcXP(100)).toBe(0);
+  it('awards XP using backend-aligned tiers', () => {
+    expect(calcXP(100)).toBe(150);
+    expect(calcXP(80)).toBe(100);
+    expect(calcXP(50)).toBe(50);
+    expect(calcXP(0)).toBe(10);
+    expect(calcXP(19)).toBe(10);
   });
 });
 
@@ -102,7 +105,13 @@ describe('getLevel', () => {
   it('maps XP to levels', () => {
     expect(getLevel(0).level).toBe(1);
     expect(getLevel(500).level).toBeGreaterThanOrEqual(2);
-    expect(getLevel(15000).name).toBe('Climate Hero');
+    expect(getLevel(15000).name).toBe('Earth Guardian');
+    expect(getLevel(35000).name).toBe('Climate Hero');
+  });
+
+  it('exposes ten canonical level thresholds', () => {
+    expect(LEVELS).toHaveLength(10);
+    expect(LEVELS[9].minXP).toBe(35000);
   });
 
   it('falls back to the first level for invalid XP values', () => {

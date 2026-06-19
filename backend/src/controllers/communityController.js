@@ -1,19 +1,18 @@
 const Post = require('../models/Post');
 const AIService = require('../services/aiService');
+const { validatePostContent } = require('../utils/validate');
 
 // @route   POST /api/community/posts
 // @access  Private
 exports.createPost = async (req, res) => {
   try {
-    const { content, scope } = req.body;
-
-    if (!content || !scope) {
-      return res.status(400).json({ success: false, message: 'Content and scope are required' });
+    const validation = validatePostContent(req.body);
+    if (!validation.valid) {
+      return res.status(400).json({ success: false, message: validation.errors.join('. ') });
     }
 
-    if (!['State', 'Country'].includes(scope)) {
-      return res.status(400).json({ success: false, message: 'Invalid scope value' });
-    }
+    const { scope } = req.body;
+    const content = validation.content;
 
     // Moderate the post using Gemini AI
     const check = await AIService.moderatePost(content);
@@ -33,7 +32,7 @@ exports.createPost = async (req, res) => {
       user: user._id,
       userName: user.name,
       userAvatar: user.avatar || '',
-      content: content.trim(),
+      content,
       scope,
       district: user.district || 'Unknown',
       state: user.state || 'Unknown',

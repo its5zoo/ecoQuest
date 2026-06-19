@@ -35,6 +35,25 @@ function validateActivity(body) {
   return { valid: errors.length === 0, errors };
 }
 
+const MAX_POST_LENGTH = 2000;
+
+function validatePostContent(body) {
+  const errors = [];
+  const { content, scope } = body || {};
+  const trimmed = content != null ? String(content).trim() : '';
+
+  if (!trimmed) errors.push('Content is required');
+  if (trimmed.length > MAX_POST_LENGTH) {
+    errors.push(`Content must be ${MAX_POST_LENGTH} characters or fewer`);
+  }
+  if (!scope) errors.push('Scope is required');
+  if (scope && !['State', 'Country'].includes(scope)) {
+    errors.push('Invalid scope value');
+  }
+
+  return { valid: errors.length === 0, errors, content: trimmed };
+}
+
 function sanitizeProfileUpdates(body) {
   const allowed = ['name', 'avatar', 'bio', 'district', 'state', 'country'];
   const updates = {};
@@ -49,4 +68,12 @@ function sanitizeProfileUpdates(body) {
   return updates;
 }
 
-module.exports = { validateSignup, validateLogin, validateActivity, sanitizeProfileUpdates, EMAIL_RE };
+module.exports = {
+  validateSignup,
+  validateLogin,
+  validateActivity,
+  validatePostContent,
+  sanitizeProfileUpdates,
+  EMAIL_RE,
+  MAX_POST_LENGTH,
+};

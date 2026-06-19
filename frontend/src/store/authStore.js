@@ -44,6 +44,22 @@ const isRealJwt = (token) => {
   return parts.length === 3;
 };
 
+const decodeJwtPayload = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(normalized));
+  } catch {
+    return null;
+  }
+};
+
+const isTokenExpired = (token) => {
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return false;
+  return Date.now() >= payload.exp * 1000;
+};
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -147,8 +163,7 @@ const useAuthStore = create(
          users who have a stale mock token in localStorage.    */
       validateSession: () => {
         const { token, isAuthenticated } = get();
-        if (isAuthenticated && !isRealJwt(token)) {
-          // Clear stale / mock session silently
+        if (isAuthenticated && (!isRealJwt(token) || isTokenExpired(token))) {
           set({ user: null, token: null, isAuthenticated: false });
         }
       },
@@ -156,7 +171,8 @@ const useAuthStore = create(
       /* ── Helper for other services ─────────────────────────── */
       getToken: () => {
         const token = get().token;
-        return isRealJwt(token) ? token : null;
+        if (!isRealJwt(token) || isTokenExpired(token)) return null;
+        return token;
       },
     }),
     {

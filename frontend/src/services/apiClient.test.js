@@ -14,6 +14,36 @@ describe('getApiBase', () => {
     vi.unstubAllEnvs();
     vi.resetModules();
   });
+
+  it('preserves API roots that already include /api', async () => {
+    vi.stubEnv('VITE_API_URL', 'https://example.com/api');
+    vi.resetModules();
+    const mod = await import('./apiClient');
+    expect(mod.getApiBase()).toBe('https://example.com/api');
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('falls back to localhost in development when VITE_API_URL is unset', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+    vi.stubEnv('DEV', true);
+    vi.resetModules();
+    const mod = await import('./apiClient');
+    expect(mod.getApiBase()).toBe('http://localhost:5000/api');
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it('falls back to relative /api in production when VITE_API_URL is unset', async () => {
+    vi.stubEnv('VITE_API_URL', '');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
+    vi.resetModules();
+    const mod = await import('./apiClient');
+    expect(mod.getApiBase()).toBe('/api');
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
 });
 
 describe('getBackendOrigin', () => {

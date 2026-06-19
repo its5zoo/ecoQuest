@@ -11,6 +11,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json-summary'],
       include: ['src/utils/**/*.js', 'src/services/**/*.js'],
+      exclude: ['src/store/socialStore.js'],
       thresholds: {
         lines: 100,
         functions: 100,
