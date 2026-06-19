@@ -96,8 +96,9 @@ const useAuthStore = create(
             method: 'POST',
             body: { code },
           });
-          set({ user: mapUser(data.user), token: data.token, isAuthenticated: true });
-          return { success: true, user: mapUser(data.user) };
+          const mappedUser = mapUser(data.user);
+          set({ user: mappedUser, token: data.token, isAuthenticated: true });
+          return { success: true, user: mappedUser };
         } catch (error) {
           return { success: false, message: error.message || 'OAuth exchange failed' };
         }

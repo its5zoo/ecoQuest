@@ -2,7 +2,9 @@
  * Format a number with commas
  */
 export function formatNumber(n, decimals = 0) {
-  return Number(n).toLocaleString('en-IN', {
+  const value = Number(n);
+  if (!Number.isFinite(value)) return '0';
+  return value.toLocaleString('en-IN', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
@@ -56,7 +58,7 @@ export function timeAgo(dateStr) {
  * Truncate text
  */
 export function truncate(str, maxLen = 100) {
-  if (!str || str.length <= maxLen) return str;
+  if (!str || str.length <= maxLen) return str || '';
   return str.slice(0, maxLen).trim() + '…';
 }
 

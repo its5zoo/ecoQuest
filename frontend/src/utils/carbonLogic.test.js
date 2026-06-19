@@ -10,7 +10,6 @@ import {
   QUICK_ACTIVITIES,
   CATEGORIES,
 } from './carbonLogic';
-import { parseSvgAvatarId } from './helpers';
 
 describe('carbonLogic exports', () => {
   it('exposes quick activities and categories', () => {
@@ -164,13 +163,5 @@ describe('calculateFootprint', () => {
       foodType: 'meat_heavy',
       plasticPerDay: 0,
     }).daily.food).toBe(5.0);
-  });
-});
-
-describe('AvatarSVG helpers', () => {
-  it('parses svg avatar ids', () => {
-    expect(parseSvgAvatarId('__svg__c3')).toBe('c3');
-    expect(parseSvgAvatarId('https://example.com/a.png')).toBeNull();
-    expect(parseSvgAvatarId(null)).toBeNull();
   });
 });

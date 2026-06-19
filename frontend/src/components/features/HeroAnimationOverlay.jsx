@@ -81,37 +81,6 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
   }, [phase]);
 
   useEffect(() => {
-    setTimeout(() => {
-      const earth = earthContainerRef?.current;
-      const human = humanContainerRef?.current;
-      const canvas = canvasRef.current;
-      console.log('LAYOUT_STATS:', JSON.stringify({
-        earth: earth ? {
-          rect: earth.getBoundingClientRect(),
-          offsetLeft: earth.offsetLeft,
-          offsetTop: earth.offsetTop,
-          offsetWidth: earth.offsetWidth,
-          offsetHeight: earth.offsetHeight
-        } : null,
-        human: human ? {
-          rect: human.getBoundingClientRect(),
-          offsetLeft: human.offsetLeft,
-          offsetTop: human.offsetTop,
-          offsetWidth: human.offsetWidth,
-          offsetHeight: human.offsetHeight
-        } : null,
-        canvas: canvas ? {
-          rect: canvas.getBoundingClientRect(),
-          offsetLeft: canvas.offsetLeft,
-          offsetTop: canvas.offsetTop,
-          offsetWidth: canvas.offsetWidth,
-          offsetHeight: canvas.offsetHeight
-        } : null
-      }));
-    }, 2000);
-  }, [earthContainerRef, humanContainerRef]);
-
-  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -192,16 +161,6 @@ export default function HeroAnimationOverlay({ phase, earthContainerRef, humanCo
         const humanRect = humanEl.getBoundingClientRect();
         humanX = humanRect.left - canvasRect.left;
         humanY = humanRect.top - canvasRect.top;
-      }
-
-      if (frame % 60 === 0) {
-        console.log('REALTIME_STATS:', JSON.stringify({
-          phase: currentPhase,
-          earthX,
-          earthY,
-          earthRect: earthContainerRef?.current ? earthContainerRef.current.getBoundingClientRect() : null,
-          canvasRect
-        }));
       }
 
       // Apply coordinates offset shifts directly to particles to eliminate transition lag

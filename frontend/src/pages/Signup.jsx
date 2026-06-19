@@ -4,11 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import useAuthStore from '../store/authStore';
 import Icon from '../components/shared/Icon';
+import { getBackendOrigin } from '../services/apiClient';
 
-const rawBackend = import.meta.env.VITE_API_URL
-  ? import.meta.env.VITE_API_URL.replace('/api', '')
-  : 'https://ecoquest-production-ca0e.up.railway.app';
-const BACKEND = rawBackend.replace(/\/+$/, '');
+const BACKEND = getBackendOrigin();
 
 /* ── Gmail Validator Logic ───────────────────────────────────────────────── */
 const isValidGmail = (v) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(v.trim());

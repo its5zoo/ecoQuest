@@ -4,23 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import Icon from '../components/shared/Icon';
 import AvatarSVG from '../components/shared/AvatarSVG';
-import { parseSvgAvatarId } from '../utils/helpers';
+import { parseSvgAvatarId, timeAgo } from '../utils/helpers';
 import useAuthStore from '../store/authStore';
 import { fetchPosts, createPost } from '../services/socialService';
 import { fetchLeaderboard, mapLeaderboardEntry } from '../services/leaderboardService';
-
-/* ── Helpers ───────────────────────────────────────────────── */
-const formatRelativeTime = (dateStr) => {
-  const diffMs  = Date.now() - new Date(dateStr);
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHr  = Math.floor(diffMin / 60);
-  const diffDay = Math.floor(diffHr / 24);
-  if (diffSec < 60)  return 'Just now';
-  if (diffMin < 60)  return `${diffMin}m ago`;
-  if (diffHr  < 24)  return `${diffHr}h ago`;
-  return `${diffDay}d ago`;
-};
 
 /* ── Avatar helper (handles both SVG presets and img URLs) ─── */
 function UserAvatar({ avatar, name, size = 44 }) {
@@ -625,7 +612,7 @@ export default function Community() {
                         </div>
                         <div>
                           <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{post.userName}</div>
-                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{formatRelativeTime(post.createdAt)}</div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{timeAgo(post.createdAt)}</div>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

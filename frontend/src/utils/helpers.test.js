@@ -18,6 +18,11 @@ describe('formatNumber', () => {
     expect(formatNumber(1234)).toContain('1');
     expect(formatNumber(12.345, 2)).toContain('12');
   });
+
+  it('returns zero for non-finite values', () => {
+    expect(formatNumber(NaN)).toBe('0');
+    expect(formatNumber(undefined)).toBe('0');
+  });
 });
 
 describe('formatCarbon', () => {
@@ -66,6 +71,10 @@ describe('timeAgo', () => {
 describe('truncate', () => {
   it('returns original text when under the limit', () => {
     expect(truncate('short')).toBe('short');
+  });
+
+  it('returns empty string for nullish input', () => {
+    expect(truncate(null)).toBe('');
   });
 
   it('truncates long text with ellipsis', () => {

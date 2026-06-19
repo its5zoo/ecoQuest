@@ -5,10 +5,9 @@ import Icon from '../components/shared/Icon';
 import AvatarSVG from '../components/shared/AvatarSVG';
 import { parseSvgAvatarId } from '../utils/helpers';
 import useAuthStore from '../store/authStore';
+import { getApiBase } from '../services/apiClient';
 
-const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e.up.railway.app/api';
-const cleanApi = rawApi.replace(/\/+$/, '');
-const API = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
+const API = getApiBase();
 
 /* ── Suggestion chips shown when chat is empty ─────────────── */
 const SUGGESTIONS = [

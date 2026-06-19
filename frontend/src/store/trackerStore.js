@@ -75,6 +75,26 @@ function pickDailyQuests(dateStr) {
   return shuffled.slice(0, 3).map(q => ({ ...q, progress: 0, completed: false }));
 }
 
+function applyLevelUpProgress(currentTotalXP, newTotalXP, plantedTrees, forestLevel) {
+  const currentLevel = getLevel(currentTotalXP).level;
+  const nextLevel = getLevel(newTotalXP).level;
+  let newPlantedTrees = plantedTrees;
+  let newForestLevel = forestLevel;
+  let leveledUp = false;
+
+  if (nextLevel > currentLevel) {
+    leveledUp = true;
+    newPlantedTrees += 1;
+    newForestLevel = Math.min(10, Math.floor(newPlantedTrees / 3) + 1);
+    toast.success(
+      `🎉 LEVEL UP! You reached Level ${nextLevel}! A new tree has been planted in your Virtual Forest! 🌳`,
+      { autoClose: 6000 }
+    );
+  }
+
+  return { newPlantedTrees, newForestLevel, leveledUp };
+}
+
 const useTrackerStore = create(
   persist(
     (set, get) => ({
@@ -120,7 +140,7 @@ const useTrackerStore = create(
       get suggestions() {
         const today = new Date().toDateString();
         const todayActivities = get().activities.filter(
-          a => new Date(a.timestamp).toDateString() === today
+          a => new Date(a.timestamp || Date.now()).toDateString() === today
         );
         return generateSuggestions(todayActivities);
       },
@@ -143,24 +163,18 @@ const useTrackerStore = create(
 
         const newActivity = {
           ...activity,
-          id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+          id: Date.now().toString() + Math.random().toString(36).slice(2, 7),
           timestamp: new Date().toISOString(),
         };
 
         const xpEarned = Math.max(10, Math.round((100 - calcDailyScore(activity.carbonKg * 10)) / 5));
         const newTotalXP = get().totalXP + xpEarned;
 
-        // Level up tree planting logic
-        const currentLevel = getLevel(get().totalXP).level;
-        const nextLevel = getLevel(newTotalXP).level;
-        let newPlantedTrees = get().plantedTrees;
-        let newForestLevel = get().forestLevel;
-
-        if (nextLevel > currentLevel) {
-          newPlantedTrees += 1;
-          newForestLevel = Math.min(10, Math.floor(newPlantedTrees / 3) + 1);
-          toast.success(`🎉 LEVEL UP! You reached Level ${nextLevel}! A new tree has been planted in your Virtual Forest! 🌳`, { autoClose: 6000 });
-        }
+        const {
+          newPlantedTrees,
+          newForestLevel,
+          leveledUp,
+        } = applyLevelUpProgress(get().totalXP, newTotalXP, get().plantedTrees, get().forestLevel);
 
         // Unlock badges — check XP, streak, and actRequired
         const newActCount = get().activities.length + 1; // +1 for the activity being added
@@ -227,8 +241,8 @@ const useTrackerStore = create(
         // Sync activity to backend in background if user is authenticated
         try {
           import('./authStore').then(({ default: useAuthStore }) => {
-            const token = useAuthStore.getState().token;
-            if (token && token !== 'mock-token-fallback') {
+            const token = useAuthStore.getState().getToken();
+            if (token) {
               import('../services/apiClient').then(({ default: apiRequest }) => {
                 apiRequest('/tracker/add', {
                   method: 'POST',
@@ -267,7 +281,7 @@ const useTrackerStore = create(
           console.error('Error during background sync setup:', err);
         }
 
-        return { xpEarned, coinsEarned, activity: newActivity, leveledUp: nextLevel > currentLevel };
+        return { xpEarned, coinsEarned, activity: newActivity, leveledUp };
       },
 
       refreshDailyQuests: () => {
@@ -281,18 +295,10 @@ const useTrackerStore = create(
           if (!quest || quest.completed || quest.progress < quest.target) return state;
           
           const newTotalXP = state.totalXP + quest.rewardXP;
-
-          // Level up tree planting logic
-          const currentLevel = getLevel(state.totalXP).level;
-          const nextLevel = getLevel(newTotalXP).level;
-          let newPlantedTrees = state.plantedTrees;
-          let newForestLevel = state.forestLevel;
-
-          if (nextLevel > currentLevel) {
-            newPlantedTrees += 1;
-            newForestLevel = Math.min(10, Math.floor(newPlantedTrees / 3) + 1);
-            toast.success(`🎉 LEVEL UP! You reached Level ${nextLevel}! A new tree has been planted in your Virtual Forest! 🌳`, { autoClose: 6000 });
-          }
+          const {
+            newPlantedTrees,
+            newForestLevel,
+          } = applyLevelUpProgress(state.totalXP, newTotalXP, state.plantedTrees, state.forestLevel);
 
           return {
             quests: state.quests.map(q => q.id === id ? { ...q, completed: true } : q),
@@ -328,18 +334,11 @@ const useTrackerStore = create(
         }
 
         const newTotalXP = state.totalXP + 10;
-
-        // Level up tree planting logic
-        const currentLevel = getLevel(state.totalXP).level;
-        const nextLevel = getLevel(newTotalXP).level;
-        let newPlantedTrees = state.plantedTrees;
-        let newForestLevel = state.forestLevel;
-
-        if (nextLevel > currentLevel) {
-          newPlantedTrees += 1;
-          newForestLevel = Math.min(10, Math.floor(newPlantedTrees / 3) + 1);
-          toast.success(`🎉 LEVEL UP! You reached Level ${nextLevel}! A new tree has been planted in your Virtual Forest! 🌳`, { autoClose: 6000 });
-        }
+        const {
+          newPlantedTrees,
+          newForestLevel,
+          leveledUp,
+        } = applyLevelUpProgress(state.totalXP, newTotalXP, state.plantedTrees, state.forestLevel);
 
         set({
           readArticles: [...state.readArticles, id],
@@ -351,7 +350,7 @@ const useTrackerStore = create(
           forestLevel: newForestLevel,
         });
         
-        return { success: true, message: 'rewarded', leveledUp: nextLevel > currentLevel };
+        return { success: true, message: 'rewarded', leveledUp };
       },
 
       plantTree: () => {

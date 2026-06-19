@@ -1,56 +1,41 @@
+import apiRequest from './apiClient';
 import useAuthStore from '../store/authStore';
 
-const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e.up.railway.app/api';
-const cleanApi = rawApi.replace(/\/+$/, '');
-const BACKEND = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
+function requireAuthToken() {
+  const token = useAuthStore.getState().getToken();
+  if (!token) throw new Error('Not authenticated');
+  return token;
+}
 
 export const fetchPosts = async (scope, district, state) => {
-  const token = useAuthStore.getState().token;
-  if (!token) throw new Error('Not authenticated');
+  const token = requireAuthToken();
 
-  let url = `${BACKEND}/community/posts?scope=${scope}`;
+  let path = `/community/posts?scope=${encodeURIComponent(scope)}`;
   if (scope === 'District' && district) {
-    url += `&district=${encodeURIComponent(district)}`;
+    path += `&district=${encodeURIComponent(district)}`;
   } else if (scope === 'State' && state) {
-    url += `&state=${encodeURIComponent(state)}`;
+    path += `&state=${encodeURIComponent(state)}`;
   }
 
-  const res = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Failed to fetch posts');
-  }
-
-  const data = await res.json();
+  const data = await apiRequest(path, { token });
   return data.posts;
 };
 
 export const createPost = async (content, scope) => {
-  const token = useAuthStore.getState().token;
-  if (!token) throw new Error('Not authenticated');
+  const token = requireAuthToken();
 
-  const res = await fetch(`${BACKEND}/community/posts`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ content, scope })
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
+  try {
+    const data = await apiRequest('/community/posts', {
+      method: 'POST',
+      token,
+      body: { content, scope },
+    });
+    return { success: true, post: data.post };
+  } catch (err) {
     return {
       success: false,
-      isModerationFailure: !!data.isModerationFailure,
-      message: data.message || 'Failed to create post'
+      isModerationFailure: Boolean(err.data?.isModerationFailure),
+      message: err.message || 'Failed to create post',
     };
   }
-
-  return { success: true, post: data.post };
 };

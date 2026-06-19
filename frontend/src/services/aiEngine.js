@@ -65,9 +65,10 @@ export const generateSmartInsights = (weeklyActivities) => {
   return generated;
 };
 
-export const generateLiveScoreMessage = (activity) => {
-  const kg = activity.carbonKg.toFixed(1);
-  const catName = CATEGORIES[activity.category]?.label || activity.category;
+export const generateLiveScoreMessage = (activity, random = Math.random) => {
+  const carbonKg = Number(activity?.carbonKg ?? 0);
+  const kg = carbonKg.toFixed(1);
+  const catName = CATEGORIES[activity?.category]?.label || activity?.category;
   
   const positiveTemplates = [
     `Great job! By choosing an eco-friendly ${catName} option, you saved potential emissions.`,
@@ -79,9 +80,8 @@ export const generateLiveScoreMessage = (activity) => {
     `A footprint of ${kg}kg CO₂ was added from ${catName}. Consider offsetting this with a planted tree!`
   ];
 
-  if (activity.carbonKg > 5) {
-    return highImpactTemplates[Math.floor(Math.random() * highImpactTemplates.length)];
-  } else {
-    return positiveTemplates[Math.floor(Math.random() * positiveTemplates.length)];
+  if (carbonKg > 5) {
+    return highImpactTemplates[Math.floor(random() * highImpactTemplates.length)];
   }
+  return positiveTemplates[Math.floor(random() * positiveTemplates.length)];
 };

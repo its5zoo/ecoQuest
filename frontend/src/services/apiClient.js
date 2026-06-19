@@ -2,6 +2,16 @@ const rawApi = import.meta.env.VITE_API_URL || 'https://ecoquest-production-ca0e
 const cleanApi = rawApi.replace(/\/+$/, '');
 const API_BASE = cleanApi.endsWith('/api') ? cleanApi : `${cleanApi}/api`;
 
+/** Normalized API root including `/api` suffix. */
+export function getApiBase() {
+  return API_BASE;
+}
+
+/** Backend origin without the `/api` path segment. */
+export function getBackendOrigin() {
+  return API_BASE.replace(/\/api$/, '');
+}
+
 /**
  * Central fetch wrapper.
  * Throws an Error with `err.status` (HTTP status code) and `err.data` on non-2xx.

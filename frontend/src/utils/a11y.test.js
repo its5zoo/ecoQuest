@@ -5,11 +5,13 @@ describe('keyboardActivate', () => {
   it('invokes handler on Enter and Space', () => {
     const handler = vi.fn();
     const onKeyDown = keyboardActivate(handler);
+    const preventDefault = vi.fn();
 
-    onKeyDown({ key: 'Enter', preventDefault: vi.fn() });
-    onKeyDown({ key: ' ', preventDefault: vi.fn() });
+    onKeyDown({ key: 'Enter', preventDefault });
+    onKeyDown({ key: ' ', preventDefault });
 
     expect(handler).toHaveBeenCalledTimes(2);
+    expect(preventDefault).toHaveBeenCalledTimes(2);
   });
 
   it('ignores unrelated keys', () => {
@@ -24,11 +26,9 @@ describe('keyboardActivate', () => {
 
 describe('prefersReducedMotion', () => {
   it('returns false when window is unavailable', () => {
-    const originalWindow = global.window;
-    // eslint-disable-next-line no-global-assign
-    global.window = undefined;
+    vi.stubGlobal('window', undefined);
     expect(prefersReducedMotion()).toBe(false);
-    global.window = originalWindow;
+    vi.unstubAllGlobals();
   });
 
   it('returns matchMedia result when available', () => {
