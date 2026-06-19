@@ -380,6 +380,17 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    if (selectedConcept) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedConcept]);
+
 
   const toggleTip = (index) => {
     setExpandedTips(prev => ({
@@ -968,9 +979,9 @@ export default function Home() {
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '24px',
+              overflowY: 'auto',
+              padding: '24px 16px',
+              boxSizing: 'border-box'
             }}
             onClick={() => setSelectedConcept(null)}
           >
@@ -988,8 +999,7 @@ export default function Home() {
                 padding: 'clamp(20px, 4vw, 36px)',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.35)',
                 border: '1.5px solid rgba(0,0,0,0.05)',
-                overflowY: 'auto',
-                maxHeight: '90vh',
+                margin: 'auto',
                 boxSizing: 'border-box'
               }}
             >
