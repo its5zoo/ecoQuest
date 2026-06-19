@@ -40,6 +40,14 @@
       "src/utils/**/*.js",
       "src/middleware/**/*.js",
       "src/config/secrets.js"
-    ]
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    }
   }
 }
