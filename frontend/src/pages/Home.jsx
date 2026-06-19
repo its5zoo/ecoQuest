@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CountUpModule from 'react-countup';
@@ -327,6 +328,17 @@ export default function Home() {
   const [expandedTips, setExpandedTips] = useState({});
   const [selectedConcept, setSelectedConcept] = useState(null);
 
+  useEffect(() => {
+    if (selectedConcept) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedConcept]);
+
   const earthContainerRef = useRef(null);
   const humanContainerRef = useRef(null);
   const [animPhase, setAnimPhase] = useState(0);
@@ -379,17 +391,6 @@ export default function Home() {
       html.style.scrollBehavior = originalScrollBehavior;
     };
   }, []);
-
-  useEffect(() => {
-    if (selectedConcept) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [selectedConcept]);
 
 
   const toggleTip = (index) => {
@@ -966,7 +967,7 @@ export default function Home() {
 
       {/* Dynamic Awareness Modal for Energy, Travel, and Waste */}
       <AnimatePresence>
-        {selectedConcept && (
+        {selectedConcept && createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -979,9 +980,9 @@ export default function Home() {
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               display: 'flex',
-              overflowY: 'auto',
-              padding: '24px 16px',
-              boxSizing: 'border-box'
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px',
             }}
             onClick={() => setSelectedConcept(null)}
           >
@@ -999,7 +1000,8 @@ export default function Home() {
                 padding: 'clamp(20px, 4vw, 36px)',
                 boxShadow: '0 25px 60px rgba(0,0,0,0.35)',
                 border: '1.5px solid rgba(0,0,0,0.05)',
-                margin: 'auto',
+                overflowY: 'auto',
+                maxHeight: '90vh',
                 boxSizing: 'border-box'
               }}
             >
@@ -1091,7 +1093,8 @@ export default function Home() {
                 </motion.button>
               </div>
             </motion.div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
 

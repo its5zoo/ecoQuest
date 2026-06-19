@@ -21,7 +21,9 @@ export function formatCarbon(kg) {
  * Format a date string
  */
 export function formatDate(dateStr, opts = {}) {
+  if (!dateStr) return 'N/A';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return 'N/A';
   return date.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
@@ -34,8 +36,10 @@ export function formatDate(dateStr, opts = {}) {
  * Format time ago
  */
 export function timeAgo(dateStr) {
+  if (!dateStr) return 'N/A';
   const now = new Date();
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return 'N/A';
   const diffMs = now - date;
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
