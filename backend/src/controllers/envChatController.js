@@ -90,7 +90,10 @@ exports.sendMessage = async (req, res) => {
       chat.messages.push(userMsg, aiMsg);
       await chat.save();
 
-      return res.json({ success: true, userMessage: userMsg, aiMessage: aiMsg });
+      const savedUserMsg = chat.messages[chat.messages.length - 2];
+      const savedAiMsg   = chat.messages[chat.messages.length - 1];
+
+      return res.json({ success: true, userMessage: savedUserMsg, aiMessage: savedAiMsg });
     } else {
       // Guest IP limit check: at most 2 messages in the last 24 hours
       const ip = req.ip;
